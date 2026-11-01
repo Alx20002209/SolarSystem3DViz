@@ -66,11 +66,11 @@ Moon semimajor axes, periods, eccentricities and inclinations: JPL Planetary Sat
 
 
 
-Sizes and orbital distances are independently compressed. Orientations and starting phases are illustrative, not real-time astronomical positions. Moon reference planes are simplified to parent equators except Earth and Nereid. Inclination greater than 90 degrees makes Triton retrograde. No N-body dynamics or precession is simulated.
+Planet positions for the selected date use JPL approximate Keplerian elements and rates valid from 1800 through 2050: https://ssd.jpl.nasa.gov/planets/approx_pos.html. These are approximate heliocentric positions, not high-precision Horizons ephemerides; Earth uses the Earth-Moon barycentre elements. Sizes and orbital distances are independently compressed for display. Moon orbital phases and orientations remain illustrative because mean elements do not provide epoch-specific positions. Moon reference planes are simplified to parent equators except Earth and Nereid. Inclination greater than 90 degrees makes Triton retrograde. No N-body dynamics or precession is simulated.
 
 
 
-Default planetary motion advances 0.25 Earth days per second (160 times slower than the previous 40 days/sec). Moon orbits advance 0.0009375 days/sec by default. The slider changes orbital speed only. Pause and speed zero hold both planetary and moon orbital positions while gentle axial rotation and solar plasma effects continue. Planet surface turns take 2вЂ“6 minutes, scaled illustratively from real rotation periods; moon surfaces turn every three minutes. These visual spins are not physically synchronized or tidally locked. The information panel continues to show real orbital and sidereal periods.
+The date slider selects a UTC calendar day and initially opens at the current date. The speed control advances the shared simulation clock at 0.25 Earth days per second by default (160 times slower than the previous 40 days/sec); selecting a date pauses motion. Planet and moon orbits then advance by the same simulated Earth-day interval, though moon phases at any date remain illustrative. Playback stops at the end of the JPL element range in 2050. Pause and speed zero hold orbital positions while gentle axial rotation and solar plasma effects continue. Planet surface turns take 2–6 minutes, scaled illustratively from real rotation periods; moon surfaces turn every three minutes. These visual spins are not physically synchronized or tidally locked. The information panel continues to show real orbital and sidereal periods.
 
 
 

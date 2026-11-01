@@ -8,12 +8,16 @@ import {EffectComposer} from './vendor/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from './vendor/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from './vendor/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from './vendor/addons/postprocessing/OutputPass.js';
-import {positionAt,TAU} from './orbits.js';
+import {positionAt,planetPositionAt,TAU} from './orbits.js';
 import {enhancePlanet,enhanceMoon} from './materials.js';
 import {createAsteroids} from './asteroids.js';
 import {createEnvironment} from './environment.js';
 import {createSun,createStars} from './effects.js';
 const $=id=>document.getElementById(id);
+const modelInfo=$('model-info'),modelParagraphs=modelInfo.querySelectorAll('p');
+modelParagraphs[2].textContent="Planet positions for selected dates use JPL's approximate Keplerian elements valid from 1800 through 2050; this is not a high-precision Horizons ephemeris. Display distances and sizes are compressed. Moon orbital phases and orientations remain illustrative. Surface spin uses an independent, gentle visual clock: one turn every 2–6 minutes, even when orbital movement is paused or set to zero.";
+modelParagraphs[3].textContent='22 selected moons are included: Earth’s Moon, Phobos and Deimos, the four Galilean moons, seven major Saturnian moons, the five major Uranian moons, and Triton, Proteus and Nereid. This is not every known moon. Moon periods and eccentricities use JPL mean elements; starting phases and orientations are simplified. The date slider selects a UTC day; the speed control advances planet and moon orbits on one simulation clock. Pause freezes both orbital clocks. Moon surfaces turn illustratively every three minutes, independently of orbital phase.';
+const ephemerisLink=document.createElement('a');ephemerisLink.href='https://ssd.jpl.nasa.gov/planets/approx_pos.html';ephemerisLink.target='_blank';ephemerisLink.rel='noopener';ephemerisLink.textContent='JPL approximate planetary positions ↗';modelInfo.insertBefore(ephemerisLink,modelInfo.querySelector('a'));
 export const interactableObjects=[];
 const menu=createMenu();
 createAtmospherePanel(()=>$('planet-name').textContent);
@@ -29,20 +33,24 @@ scene.add(new THREE.AmbientLight(0xffffff,.16));const light=new THREE.PointLight
 const solar=createSun(scene);createStars(scene);
 const renderTarget=new THREE.WebGLRenderTarget(innerWidth,innerHeight,{type:THREE.HalfFloatType,samples:4});const composer=new EffectComposer(renderer,renderTarget);composer.addPass(new RenderPass(scene,camera));const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.25,.15,1.15);composer.addPass(bloom);composer.addPass(new OutputPass());
 const orbitGroup=new THREE.Group();scene.add(orbitGroup);const bodies=[],moons=[];
-let selected=2,selectedMoon=null,selectedAsteroid=null,following=false,paused=false,days=0,spinSeconds=0,moonDays=0,effectTime=0,names=true,moonsVisible=true;
+const DAY_MS=86400000,J2000_MS=Date.UTC(2000,0,1,12),MIN_DATE_DAYS=Math.round((Date.UTC(1800,0,1,12)-J2000_MS)/DAY_MS),MAX_DATE_DAYS=Math.round((Date.UTC(2050,11,31,12)-J2000_MS)/DAY_MS);
+let selected=2,selectedMoon=null,selectedAsteroid=null,following=false,paused=false,days=Math.max(MIN_DATE_DAYS,Math.min(MAX_DATE_DAYS,(Date.now()-J2000_MS)/DAY_MS)),spinSeconds=0,effectTime=0,names=true,moonsVisible=true;
+const dateSlider=$('date'),dateOutput=$('date-output'),dateFormatter=new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'});
+dateSlider.min=String(MIN_DATE_DAYS);dateSlider.max=String(MAX_DATE_DAYS);dateSlider.value=String(Math.round(days));days=Number(dateSlider.value);
+function updateDateLabel(){const day=Math.round(days),value=String(day);if(dateSlider.value!==value)dateSlider.value=value;const label=dateFormatter.format(new Date(J2000_MS+day*DAY_MS));if(dateOutput.textContent!==label)dateOutput.textContent=label}
 let cameraFlight=null;
 const loader=new GLTFLoader();
 function pickMeshes(model,onClick){model.traverse(o=>{if(o.isMesh){o.userData.onClick=onClick;interactableObjects.push(o)}})}
 function label(name,type='planet-label'){const el=document.createElement('div');el.className=type;el.textContent=name.toUpperCase();$('labels').append(el);return el}
-function orbit(p,phase=0){const pts=[];for(let j=0;j<=256;j++)pts.push(new THREE.Vector3(...positionAt(p,p.period*j/256,phase)));return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.32}))}
+function orbit(p,phase=0,planetIndex=null){const pts=[];for(let j=0;j<=256;j++)pts.push(new THREE.Vector3(...(planetIndex===null?positionAt(p,p.period*j/256,phase):planetPositionAt(p,planetIndex,p.period*j/256))));return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.32}))}
 try{
- await Promise.all(planets.map(async(p,i)=>{const gltf=await loader.loadAsync(`./assets/${p.name.toLowerCase()}.glb`);const root=new THREE.Group(),tilt=new THREE.Group(),model=gltf.scene;root.add(tilt);tilt.add(model);tilt.rotation.z=THREE.MathUtils.degToRad(p.tilt);scene.add(root);enhancePlanet(p,model,tilt);pickMeshes(model,()=>selectPlanet(i));const line=orbit(p);orbitGroup.add(line);bodies[i]={root,tilt,model,label:label(p.name),phase:i*.72};root.position.fromArray(positionAt(p,0,i*.72));}));
+ await Promise.all(planets.map(async(p,i)=>{const gltf=await loader.loadAsync(`./assets/${p.name.toLowerCase()}.glb`);const root=new THREE.Group(),tilt=new THREE.Group(),model=gltf.scene;root.add(tilt);tilt.add(model);tilt.rotation.z=THREE.MathUtils.degToRad(p.tilt);scene.add(root);enhancePlanet(p,model,tilt);pickMeshes(model,()=>selectPlanet(i));const line=orbit(p,0,i);orbitGroup.add(line);bodies[i]={root,tilt,model,label:label(p.name),phase:i*.72};root.position.fromArray(planetPositionAt(p,i,days));}));
  await Promise.all(moonData.map(async(m,index)=>{
   const parentIndex=planets.findIndex(p=>p.name===m.parent),p=planets[parentIndex],asset=await loader.loadAsync(`./assets/${m.name.toLowerCase()}.glb`);
-  const plane=new THREE.Group();bodies[parentIndex].root.add(plane);if(m.parent!=='Earth'&&m.name!=='Nereid')plane.rotation.z=THREE.MathUtils.degToRad(p.tilt);
+    const plane=new THREE.Group();bodies[parentIndex].root.add(plane);if(m.parent!=='Earth'&&m.name!=='Nereid')plane.rotation.z=THREE.MathUtils.degToRad(p.tilt);
   const orbitData={...m,orbit:Math.max(m.orbit,p.radius*1.8/(1-m.e))};const node=new THREE.Group();node.add(asset.scene);plane.add(node);
   enhanceMoon(m,asset.scene,node);
-  const line=orbit(orbitData);line.material.opacity=.2;plane.add(line);const item={...m,orbitData,parentIndex,node,plane,line,model:asset.scene,label:label(m.name,'planet-label moon-label'),phase:index*1.3};moons[index]=item;node.position.fromArray(positionAt(orbitData,0,item.phase));pickMeshes(asset.scene,()=>selectMoon(item));
+    const line=orbit(orbitData);line.material.opacity=.2;plane.add(line);const item={...m,orbitData,parentIndex,node,plane,line,model:asset.scene,label:label(m.name,'planet-label moon-label'),phase:index*1.3};moons[index]=item;node.position.fromArray(positionAt(orbitData,days,item.phase));pickMeshes(asset.scene,()=>selectMoon(item));
  }));
 }catch(error){$('loading').textContent='A planet or moon could not load. Reload to try again.';throw error}
 const environment=createEnvironment(scene,bodies,moons,environmentData);
@@ -99,7 +107,7 @@ const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();let down;
 renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY]});renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5){down=null;return}down=null;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);const visible=interactableObjects.filter(o=>{let p=o;while(p){if(!p.visible)return false;p=p.parent}return true});raycaster.intersectObjects(visible,false)[0]?.object.userData.onClick?.()});
 function overview(top=false){cancelFlight();following=false;controls.minDistance=.5;camera.position.set(top?0:102,top?205:125,top?.01:140);if(innerWidth<650)camera.position.multiplyScalar(1.3);controls.target.set(0,0,0);controls.update();showDetails()}
 $('home').onclick=()=>overview();$('top').onclick=()=>overview(true);$('focus').onclick=()=>focus();
-$('play').onclick=()=>{paused=!paused;$('play').textContent=paused?'▶':'Ⅱ';$('play').setAttribute('aria-label',paused?'Resume orbital movement':'Pause orbital movement')};$('time').oninput=()=>{$('time-output').textContent=`${$('time').value} days / sec`};
+$('play').onclick=()=>{paused=!paused;$('play').textContent=paused?'▶':'Ⅱ';$('play').setAttribute('aria-label',paused?'Resume orbital movement':'Pause orbital movement')};$('time').oninput=()=>{$('time-output').textContent=`${$('time').value} days / sec`};dateSlider.oninput=()=>{days=Number(dateSlider.value);paused=true;$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement');updateDateLabel()};
 $('paths').onclick=()=>{orbitGroup.visible=!orbitGroup.visible;$('paths').textContent=`Orbits ${orbitGroup.visible?'on':'off'}`;$('paths').setAttribute('aria-pressed',orbitGroup.visible)};
 $('names').onclick=()=>{names=!names;$('names').textContent=`Labels ${names?'on':'off'}`;$('names').setAttribute('aria-pressed',names)};
 $('moons').onclick=()=>{moonsVisible=!moonsVisible;if(!moonsVisible&&selectedMoon)selectPlanet(selected);$('moons').textContent=`Moons ${moonsVisible?'on':'off'}`;$('moons').setAttribute('aria-pressed',moonsVisible)};
@@ -111,9 +119,9 @@ $('about').onclick=()=>$('model-info').showModal();$('close-about').onclick=()=>
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight)});
 scene.updateMatrixWorld(true);overview();$('loading').remove();const clock=new THREE.Clock(),v=new THREE.Vector3(),old=new THREE.Vector3(),temp=new THREE.Vector3();
 function placeLabel(el,position,offset,visible=true){v.copy(position);v.y+=offset;v.project(camera);el.style.display=names&&visible&&v.z<1&&v.z>-1?'block':'none';el.style.transform=`translate(${(v.x*.5+.5)*innerWidth}px,${(-v.y*.5+.5)*innerHeight}px) translate(-50%,-100%)`}
-function animate(){requestAnimationFrame(animate);const frameDt=Math.min(clock.getDelta(),.05),dt=menu.isOpen?0:frameDt,rate=Number($('time').value);if(!paused){days+=dt*rate;moonDays+=dt*.15*rate/40}spinSeconds+=dt;effectTime+=dt*.35;old.copy(selectedPosition());
- bodies.forEach((b,i)=>{b.root.position.fromArray(positionAt(planets[i],days,b.phase));b.model.rotation.y=TAU*spinSeconds/Math.min(360,Math.max(120,180*Math.sqrt(Math.abs(planets[i].rotation)/23.9)));if(b.model.userData.clouds)b.model.userData.clouds.rotation.y=b.model.rotation.y*1.035});
- moons.forEach(m=>{m.node.position.fromArray(positionAt(m.orbitData,moonDays,m.phase));m.model.rotation.y=TAU*spinSeconds/180;m.plane.visible=moonsVisible;m.line.visible=orbitGroup.visible&&m.parentIndex===selected&&following});environment.belts.visible=environment.beltsOn&&!(following&&selectedAsteroid);asteroids.update(days,spinSeconds);solar.update(effectTime);scene.updateMatrixWorld(true);
+function animate(){requestAnimationFrame(animate);const frameDt=Math.min(clock.getDelta(),.05),dt=menu.isOpen?0:frameDt,rate=Number($('time').value);if(!paused){days=Math.min(MAX_DATE_DAYS,days+dt*rate);if(days>=MAX_DATE_DAYS){paused=true;$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement')}}spinSeconds+=dt;effectTime+=dt*.35;old.copy(selectedPosition());
+ bodies.forEach((b,i)=>{b.root.position.fromArray(planetPositionAt(planets[i],i,days));b.model.rotation.y=TAU*spinSeconds/Math.min(360,Math.max(120,180*Math.sqrt(Math.abs(planets[i].rotation)/23.9)));if(b.model.userData.clouds)b.model.userData.clouds.rotation.y=b.model.rotation.y*1.035});
+ moons.forEach(m=>{m.node.position.fromArray(positionAt(m.orbitData,days,m.phase));m.model.rotation.y=TAU*spinSeconds/180;m.plane.visible=moonsVisible;m.line.visible=orbitGroup.visible&&m.parentIndex===selected&&following});environment.belts.visible=environment.beltsOn&&!(following&&selectedAsteroid);asteroids.update(days,spinSeconds);solar.update(effectTime);scene.updateMatrixWorld(true);
  for(const b of beltObstacles){b.node.getWorldPosition(obstaclePosition);b.x=obstaclePosition.x;b.y=obstaclePosition.y;b.z=obstaclePosition.z;}
  environment.update(days,spinSeconds,beltObstacles);
  if(cameraFlight){
@@ -126,6 +134,6 @@ function animate(){requestAnimationFrame(animate);const frameDt=Math.min(clock.g
   if(!menu.isOpen)controls.update();
  }
  camera.updateMatrixWorld();
- bodies.forEach((b,i)=>placeLabel(b.label,b.root.position,planets[i].radius+1));moons.forEach(m=>{m.node.getWorldPosition(temp);placeLabel(m.label,temp,m.radius+.2,moonsVisible&&m.parentIndex===selected&&following&&camera.position.distanceTo(temp)<55)});placeLabel(sunLabel,new THREE.Vector3(),3.6);asteroids.items.forEach(a=>placeLabel(a.label,a.root.position,a.radius+.4,!following||selectedAsteroid===a));environmentLabels.forEach(a=>placeLabel(a.label,a.position,1,environment.beltsOn&&!following));$('elapsed').textContent=`DAY ${Math.floor(days).toString().padStart(5,'0')}`;composer.render();}animate();
+ bodies.forEach((b,i)=>placeLabel(b.label,b.root.position,planets[i].radius+1));moons.forEach(m=>{m.node.getWorldPosition(temp);placeLabel(m.label,temp,m.radius+.2,moonsVisible&&m.parentIndex===selected&&following&&camera.position.distanceTo(temp)<55)});placeLabel(sunLabel,new THREE.Vector3(),3.6);asteroids.items.forEach(a=>placeLabel(a.label,a.root.position,a.radius+.4,!following||selectedAsteroid===a));environmentLabels.forEach(a=>placeLabel(a.label,a.position,1,environment.beltsOn&&!following));updateDateLabel();composer.render();}animate();
 window.solarSystem={scene,camera,controls,bodies,moons,planets,interactableObjects,asteroids,get days(){return days}};
 
