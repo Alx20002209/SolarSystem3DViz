@@ -1,0 +1,164 @@
+ORBITAL ATLAS — IMPROVEMENT AUDIT
+Date: 1 November 2026
+Project: C:\Users\alexk\SolarSystem\SolarSystem3DViz
+Scope: strategy, scientific representation, visual quality, interaction, accessibility, performance, Blender pipeline, engineering and release process.
+
+1. Audit basis and limits. This report examines the current local JavaScript, HTML, CSS, JSON data, Blender scripts, exported GLB contents, attribution files and existing checks. It also uses the previously reviewed desktop screenshots of the overview and Enceladus. Existing orbit/asset and motion checks were rerun successfully. This audit does not claim fresh mobile-device testing, measured frame rates, GPU memory measurements, a complete Blender rebuild, or a current hosted-site inspection. Performance improvements below are proposals until measured.
+
+2. Priority definitions. P1 means the next improvement cycle: reliability, clear presentation and major loading costs. P2 means the following cycle: deeper realism, broader interaction and maintainability. P3 means optional expansion after the core experience is stable. Effort is relative: small is a focused change; medium spans a module or asset workflow; large spans several systems. These are not delivery-time promises.
+
+3. Strategic goal — preserve the intended identity. Keep pure black space, white orbital paths, crisp surface detail, a fiery Sun, luminous stars and very slow default motion. Preserve gentle axial rotation when ordinary orbital pause is selected. Treat these as release acceptance requirements rather than settings that optimization may silently remove. P1; small.
+
+4. Strategic goal — define the product as an educational visual atlas. The current compressed sizes, separate time scales and illustrative orientations suit exploration. Make this contract visible with a short persistent “Illustrative scale” indicator and optional details. Do not present the simulation as current astronomical positions. Done when a first-time visitor can distinguish real data from presentation choices without opening a long technical explanation. P1; small.
+
+5. Strategic goal — define three levels of exploration. Offer system overview, planet-and-moons view, and surface inspection. Give each an appropriate camera, labels and level of detail. The present Follow action jumps straight to the selected body while nearby material and orbit lines can dominate close-ups. Done when the user can move between all three levels without manually recovering the camera. P1; medium.
+
+6. Strategic goal — establish measurable quality targets. Proposed initial targets: usable overview within five seconds on a named test connection/device; no fatal failure from one missing optional moon; 60 fps desktop and at least 30 fps representative mobile during ordinary views. Record actual hardware, connection, percentile frame times and transferred bytes before committing to these targets. These are proposed goals, not current results. P1; medium.
+
+7. Strategic goal — complete the existing experience before adding many more objects. Finish loading, camera behavior, labels, material consistency and source metadata before adding comets, spacecraft or a much larger moon catalogue. Rank work by visible benefit and reliability, not object count. P1; small.
+
+8. Measured baseline. dist contains 148 files and 98,392,797 bytes (98.4 decimal MB). Assets account for 51,852,773 bytes; textures for 43,690,697; vendor files for 2,245,588. The GLBs contain 1,130,880 indexed triangles and 53 embedded images in total. These are disk totals, not initial network transfer, live triangle counts or GPU memory. Some files are unused at runtime. Save a repeatable asset-inventory command with each release. P1; small.
+
+9. Startup loading — confirmed. app.js waits for all eight planet GLBs and then all 22 moon GLBs before removing the loading screen. Show a low-detail overview first, load the selected system next, and defer other moon assets until requested or idle. Done when Earth or another selected world can be explored while unrelated moons still load. P1; large.
+
+10. Failure handling — confirmed. The four initial JSON requests and renderer creation occur outside the asset-loading try/catch. One rejected GLB Promise also stops initialization of the whole scene. Add a top-level startup boundary, readable failure messages, per-asset retry and fallback objects. Done when failed data, unsupported graphics and one missing moon each produce a recoverable screen. P1; medium.
+
+11. Texture readiness — confirmed. TextureLoader requests in materials.js are not awaited by the GLB loading barrier and have no explicit error UI. Use a shared loading manager or asset service that tracks both geometry and secondary maps. Done when “ready” accurately reflects the visible quality level and failed secondary maps have a fallback. P1; medium.
+
+12. Scene labels — confirmed from code and previous overview. Labels are projected independently with no collision avoidance or interface exclusion zones. The main-belt label and inner-world labels can overlap. Prioritize the selected object, omit low-priority labels, reserve panel/header regions and add leader lines only where useful. Done when the desktop overview and narrow view have readable, non-overlapping essential labels. P1; medium.
+
+13. Label visibility — confirmed. placeLabel checks projected depth but does not reject off-screen x/y positions before writing styles, and it does not test whether another body hides the label. Add viewport bounds, optional body occlusion and distance/size thresholds. Keep selected labels discoverable through the information panel. P2; medium.
+
+14. Close-up composition — visual finding. Enceladus looks substantially more detailed, but multiple white orbit lines and large soft gas dots cross its close-up. Preserve white orbit colour while fading irrelevant paths and suppressing background material in inspection mode. Done when the selected surface and plume can be read without unrelated lines crossing the sphere. P1; medium.
+
+15. Camera transitions — confirmed. focus directly replaces camera position and target. Add a short, interruptible eased transition with reduced-motion support, and calculate framing from the complete object bounds, including rings and plume. Done when switching between Moon, Jupiter and Saturn avoids abrupt jumps and clipped structures. P1; medium.
+
+16. Camera safety — confirmed risk. Global minDistance is fixed at 0.5, while inspected objects have very different sizes. Use target-specific zoom limits and a safe near-plane policy. Test entering rings, poles and tiny moon views. Done when normal zoom cannot place the camera inside an opaque surface unintentionally. P2; medium.
+
+17. Planet selection consistency — confirmed. Navigation selection updates details without focusing, whereas moon buttons select and follow immediately; picking a moon only selects it. Make selection behavior consistent or present explicit Select and Inspect actions. Done when mouse, touch and keyboard routes produce predictable results. P1; small.
+
+18. Hidden moon selection — confirmed code-path gap. Moons can be switched off while moon buttons remain available; a later moon-button selection can focus an invisible object. Selecting a moon should reveal its system or clearly offer to turn moons back on. Done when every selectable body has a visible result. P1; small.
+
+19. Pointer behavior — confirmed gap. Picking tracks a single pointerdown and pointerup but does not track pointer identity or pointercancel. Add cancellation and active-pointer tracking; prevent a pinch gesture from becoming a selection. Test drag, pinch, cancelled touch and right-click. P2; small.
+
+20. Interaction architecture — confirmed. interactableObjects contains mesh references with callbacks, but there is no stable body-ID registry. Separate body identity, selection state and render objects; make future instanced-object picking map instanceId to a data record. Preserve the requested interactableObjects entry point. Done when replacing an asset does not break selection or retain obsolete references. P2; medium.
+
+21. Mobile layout — code-based risk, not freshly tested. Fixed panels, small typography, a 155-pixel action grid and horizontal planet navigation compete for space. At very narrow widths the left action grid and right detail card can overlap. Use a collapsible bottom sheet, compact header and expandable layer menu. Test 320, 360, 390 and 768-pixel widths, landscape, safe-area insets and 200% text zoom. P1; medium.
+
+22. Touch targets and focus — confirmed styling concern. Several moon and scene buttons use 8–10-pixel type with small padding. Increase practical hit areas, retain visible focus, and ensure the currently selected moon exposes an accessible state rather than only an active CSS class. Verify keyboard traversal and touch selection independently. P1; medium.
+
+23. Motion accessibility — confirmed gap. Ordinary pause intentionally leaves spin and plasma moving. Keep that behavior, but add a separate “Freeze all motion” option and respect prefers-reduced-motion for camera transitions and optional effects. This follows the intent of W3C guidance without removing the requested default. Done when a user can obtain a completely stationary view [S4]. P1; medium.
+
+24. Accessible scene alternative — confirmed opportunity. The canvas has a container label and navigation buttons, but a structured nonvisual summary would make spatial relationships and layer meanings easier to explore. Provide an accessible list of bodies, parent systems, data and sources; avoid announcing per-frame changes. Test dialogs for meaningful accessible names and focus return. P2; medium.
+
+25. Time controls — confirmed. The slider advances in 0.25-day/sec steps from 0 to 10, so the default slow setting is also the smallest nonzero step. Add labelled presets and finer low-speed adjustment, with separate explanations for orbit time and visual spin. Retain 0.25 as the default unless the user changes it. Done when slower-than-default movement is possible without entering code. P2; small.
+
+26. Clock representation — confirmed. Planetary and moon clocks advance at different rates, so “period ratios are preserved” needs an explicit within-each-clock qualification. Rename the day counter as planetary simulation days and explain moon time separately. Optional science mode may share a single clock, while presentation mode retains the existing slow moon pacing. P1; small.
+
+27. Frame-rate independence — confirmed risk. dt is capped at 0.05 seconds, so below 20 fps the simulation advances less than wall time. Decide explicitly whether the clock is presentation time or elapsed real time; use an accumulated clock or fixed-step approach if the latter. On tab return, avoid an uncontrolled jump. Done when 15, 30 and 60 fps behavior matches the documented clock contract. P2; medium.
+
+28. Moon rotation accuracy — deliberate current simplification. All moon surfaces spin every four minutes independently of orbit. Add an optional synchronized-rotation demonstration for applicable moons, beginning with Earth's Moon; NASA describes its same-face relationship [S5]. Preserve independent slow spin in presentation mode. Done when each mode is labelled and the educational mode holds the expected hemisphere toward the planet. P2; medium.
+
+29. Orbital orientation — confirmed limitation. positionAt uses inclination but no ascending-node longitude, periapsis argument or epoch-based phase. For an optional date-based mode, use a defined reference frame and validated JPL Horizons data [S6]. Do not merely attach a date picker to the current illustrative starting angles. Done when sample vectors agree with a reference dataset at declared dates and units. P3; large.
+
+30. Axial conventions — needs targeted validation. Retrograde behavior is represented through large tilts while the animation takes absolute rotation periods. That can be valid, but blindly adding a negative spin would double-reverse some bodies. Define the coordinate and pole convention, then test Venus and Uranus against it. Done when the panel, axis marker and visible spin agree. P1; medium.
+
+31. Blender/browser parity — confirmed structural differences. Blender uses Z-up, browser Y-up; some tilt rotations differ in axis and moon phases use different indexing. Blender belts rotate as one aggregate at an average period while browser bodies use individual periods. Create an explicit transform and time specification shared by both generators. Done when fixed-time screenshots and reference positions match within documented artistic differences. P1; large.
+
+32. Blender animation interpolation — needs validation. Orbit locations are keyed every four frames, and interpolation is not explicitly set. Choose linear or validated interpolation and test intermediate frames and end-of-range behavior; the current scene spans only 1–1440 frames. Done when motion remains smooth without drifting or freezing unexpectedly outside the authored range. P2; medium.
+
+33. Scientific metadata — confirmed gap. Core JSON contains numerical values but not a consistent field-level unit, epoch, reference frame, source URL and retrieval date. Add a data schema that separates physical radius/distance from display radius/orbit. Done when a contributor cannot accidentally substitute kilometres for scene units. P1; medium.
+
+34. Surface provenance — confirmed inconsistency. dist/textures/ATTRIBUTION.md still says all non-lunar moon surface PNGs are original procedural reconstructions; newer files describe spacecraft maps. Rewrite the old statement to identify legacy procedural files precisely, and generate one authoritative manifest with source, credit, license, modifications and scientific limitations. Done when all published credits agree. P1; small.
+
+35. Earth materials — confirmed approximation. Ocean roughness is inferred from colour thresholds, which can misclassify coastlines, dark land and ice. Replace it with a sourced land/water mask and validate cloud UV alignment, night-side light masking and coastal transitions. Done when oceans respond consistently at grazing light and cities do not glow on the day side. P2; medium.
+
+36. Rocky surface relief — confirmed approximation. Mercury and Mars use colour imagery directly as bump; moons use high-pass albedo-derived detail. This can turn dark markings into false topography. Prefer measured elevation where available, otherwise use restrained generic detail and label it illustrative. Done when strong albedo boundaries do not produce implausible ridges. P2; large.
+
+37. Per-world visual pass — recommended. Review Mercury's crater contrast, Venus's cloud envelope, Earth's ocean/cloud separation, Mars's relief and polar caps, Jupiter's belts and storm boundaries, Saturn's rings, Uranus's restrained atmosphere and Neptune's enhanced colour. Use equal-size, fixed-light reference renders and compare against source imagery. Avoid making every atmosphere equally thick or every rocky world equally rough. P2; large.
+
+38. Small-moon silhouettes — confirmed limitation. Phobos, Deimos and Proteus receive stronger displacement but are not demonstrated to use validated shape models. Evaluate sourced shape assets and retain the current reconstruction when coverage does not justify a replacement. Done when silhouette quality improves without invented claims of exact geography. P2; medium.
+
+39. Moon texture orientation — validation gap. Source mosaics have varying coverage and processing. Verify prime-meridian direction, longitude convention, pole orientation, UV seams and map mirroring against distinctive landmarks. Add a contact sheet for all 22 moons. Done when each asset has an approved orientation and provenance entry. P1; medium.
+
+40. Sun treatment — recommended refinement. Current procedural granulation, textured colour, corona shell and 20 similar loops communicate fire, but repeated looping geometry can look ornamental. Vary prominence geometry and lifetimes, preserve darker structure between hot regions, and separate photosphere detail from bloom. Keep the orange plasma presentation explicitly illustrative. Done when close-up and overview both retain surface detail rather than a clipped glowing disk. P2; large.
+
+41. Lighting and shadows — confirmed. Mesh shadow flags are set in materials.js, but renderer shadow maps and light casting are not enabled. Add targeted ring/planet and moon eclipse shading only after profiling; analytic occlusion may be cheaper than a large point-light shadow map. Done when Saturn's ring shadow and selected-system eclipses work without violating the frame budget. P2; large.
+
+42. Ring appearance — confirmed. Saturn's rings include emissive contribution to improve readability; Uranus uses a simple unlit ring. Reduce self-lit appearance in a higher-realism mode and refine alpha sorting, radial detail and backlighting. Done when rings remain readable while responding plausibly to the Sun. P2; medium.
+
+43. Dust and gas rendering — visual finding. The Enceladus close-up shows obvious soft particle blobs and a dense plume. Tune screen-space size limits, opacity, depth fading and particle distribution; consider a small volumetric or layered impostor only if profiling supports it. Keep the existing enhanced-visibility disclosure. Done when the plume reads as diffuse material rather than a chain of cotton balls. P2; medium.
+
+44. South-polar plume alignment — validation gap. The browser plume attaches to the orbital node and points along local -Y, while Blender parents it to the spinning moon. Verify both against the adopted moon pole and map orientation. Done when the plume exits the intended south-polar region through a full rotation in each representation. P1; medium.
+
+45. Environmental distribution — confirmed simplification. Main-belt and Kuiper objects use representative circular paths and small inclination spreads. Add distribution variation only from a documented sample or explicit illustrative rule; optional future work includes resonances and selected named bodies. Do not imply that the 2,700 particles are a catalogue or that a dense ring is the naked-eye view. P2; medium.
+
+46. Layer controls — confirmed opportunity. Dust, gas and the E ring share one switch. Split them into a compact expandable layer menu and add a strength control with a reset preset. Provide an explanation when a layer is too faint at the current distance. Done when users can isolate the plume, dust or belts without cluttering the main toolbar. P2; medium.
+
+47. Star presentation — confirmed approximation. Stars are random points at finite scene radii with fixed screen sizes, so camera travel creates artificial parallax. Consider a camera-centred celestial background for distant stars, with restrained brightness distribution and optional sourced sky mode. Done when local camera movement does not make the star field look like nearby debris. P2; medium.
+
+48. GPU profiling first — required before optimization claims. Record frame-time distributions, renderer.info draw calls/triangles/textures, cold/warm loading, and representative device behavior. Account for all composer passes rather than only one render. Compare overview, Earth, Saturn and Enceladus. Done when a saved baseline identifies whether CPU, GPU fill, geometry, texture memory or loading dominates [S1]. P1; medium.
+
+49. Geometry levels of detail — confirmed opportunity. The GLB total exceeds one million triangles, despite many moons appearing as tiny dots. Export low/medium/high detail or share low-detail sphere geometry for distant bodies; load irregular/high-detail shapes on inspection. Evaluate mesh compression only against decode cost and visual quality. Done when distant bodies use materially fewer vertices without visible silhouette loss. P1; large.
+
+50. GPU texture compression — candidate. Test KTX2/Basis textures for large maps, using correct colour-space and channel handling; the official loader requires capability detection and a transcoder [S2]. Retain an appropriate fallback and assess normal/detail quality separately from colour. Done when measured memory and transfer improve without visible banding or crater loss. P2; large.
+
+51. Duplicate and unused assets — confirmed opportunity. The tree includes an 8K Earth source map, legacy preview PNGs, a Sun GLB unused by the procedural browser Sun, original/derived maps and GLB-embedded images. Build a runtime dependency manifest before removing anything. Keep authoring originals outside the deploy payload. Done when deployment includes only required runtime assets and credits while editable source assets remain recoverable. P1; medium.
+
+52. Texture reuse — confirmed. texture() creates a fresh load each call, and Saturn's ring image is requested separately for colour and emissive use. Cache compatible textures by URL, colour space and sampler settings; do not share incompatible state accidentally. Clamp anisotropy to renderer capabilities instead of hardcoding 8. Done when compatible consumers reuse one GPU texture. P2; medium.
+
+53. Hidden work — confirmed. environment.update recalculates all 2,700 instance matrices every frame even with belts hidden. Skip hidden layers, decouple slow orbital updates from surface spin, and evaluate shader-driven motion after measuring CPU cost. Instancing already reduces draw calls and should be retained [S3]. Done when disabling a layer measurably removes its update cost. P1; medium.
+
+54. Belt culling — confirmed. Belt meshes explicitly disable frustum culling. Consider bounded spatial sectors with conservative orbit-wide bounds or a distance-based detail strategy. Balance fewer invisible instances against extra draw calls; do not assume splitting always wins. Done when close-up performance improves in measured comparisons [S3]. P2; medium.
+
+55. Frame-loop allocations — confirmed. positionAt returns fresh arrays for every body; following clones vectors; label placement creates a new Sun vector each frame. Add target-output variants and reusable temporaries, and avoid rebuilding equivalent strings. Done when allocation profiling shows less transient churn without changing orbital results. P2; small.
+
+56. DOM update frequency — confirmed. Label transforms and elapsed-day text are written each frame, including unchanged day strings. Cache element references and values, update the counter only when its displayed value changes, and skip hidden labels. Done when the UI updates only as needed and labels still track smoothly. P2; small.
+
+57. Adaptive rendering quality — confirmed opportunity. The renderer uses a pixel-ratio cap of 1.75, a four-sample half-float render target and bloom with no quality selector. Add measured low/medium/high presets for pixel ratio, MSAA, bloom, atmosphere and particles; assess default antialiasing versus composer target sampling. Done when low-power devices can remain usable without losing core content. P1; medium.
+
+58. Display-density changes — confirmed gap. Resize changes renderer/composer size but does not refresh pixel ratio or particle/star pixel-ratio uniforms. Centralize display sizing and update these consistently after monitor or browser zoom changes. Done when stars and gas retain consistent apparent size across supported displays. P2; small.
+
+59. Hidden-tab and lifecycle handling — confirmed gap. There is no explicit visibility policy, context-loss recovery or resource teardown. Pause expensive updates while hidden, define resume behavior, handle WebGL loss/restoration, and dispose materials, textures, buffers and listeners when replacing a scene. Done when repeated scene resets and tab switching do not leak or produce an unrecoverable blank canvas. P1; medium.
+
+60. Reproducible project structure — confirmed opportunity. Runtime source lives directly in dist, while preparation and validation scripts live in ignored work. Move maintained modules to src, tests to tests, and reproducible preparation tools to scripts; generate dist with a documented command. Keep scratch outputs distinct. Done when a clean checkout can run the supported build and checks. P1; large.
+
+61. Dependency and export pinning — confirmed gap. Three.js is vendored but there is no root package manifest in the inspected file list. Record the exact Three.js source/version, Blender version, exporter settings and dependencies; add repeatable commands and integrity checks. A manifest need not force a framework migration. Done when another machine can reproduce assets without guessing versions. P1; medium.
+
+62. Blender repeatability — confirmed risk. The refinement pipeline optionally consumes an original image in ignored work, and repeated imports/material creation can leave orphan datablocks. Move required inputs into a maintained source-asset manifest, make repeated runs idempotent and explicitly clean only generated datablocks. Test in a temporary copy rather than overwriting the artist's working scene. Done when two clean runs produce equivalent content. P1; large.
+
+63. Blender edit preservation — confirmed risk. build_blender.py deletes scene objects and reconstructs the scene. Separate generated collections from artist-owned collections or document an export-only path for hand edits. Done when improving a material manually has a defined route back into the web export without being silently discarded on rebuild. P1; large.
+
+64. Code readability and modules — confirmed. Long compressed lines combine startup, input, selection, time, camera and rendering in app.js. Split these concerns, format source and document scene units and data contracts. Remove unused groups and redundant expressions, but keep changes behavior-preserving. Done when a focused change can be reviewed without understanding the entire application. P2; medium.
+
+65. Tests that protect behavior — confirmed gap. Existing checks cover 30 body files, orbital apsides/closure and an extracted animation-code fragment. Add tests for the actual clock module, error recovery, hidden-body selection, GLB origins, source metadata, transform parity and belt placement. Replace brittle source-string slicing with exported pure functions. Done when these regressions fail a repeatable check. P1; medium.
+
+66. Visual regression coverage — absent from maintained tests. Save fixed-seed, fixed-time reference views for overview, Earth, Saturn, Io, Enceladus and one mobile layout. Review image differences with tolerances for rendering variability. Done when a material or camera change cannot silently damage another view. P1; medium.
+
+67. Release payload and cache safety — needs verification. Assets use stable filenames and the current hosting configuration only declares a static directory. Inspect actual response headers before claiming caching behavior. Add versioned asset hashes or another atomic version strategy and test fresh and returning clients. Done when a new app module cannot load an incompatible older data or asset version. P2; medium.
+
+68. Repository and publication discipline — needs environment verification. The root git status command in this audit returned “must be run in a work tree”; an earlier session reported untracked project files. Do not infer data loss or rewrite repository metadata from that result. Inspect the repository configuration and environment read-only, then establish a clean source commit and preserve the user's GitHub remote. Keep the separate Sites publication checkout explicit. P1; medium.
+
+69. Documentation and external font dependency — confirmed. CSS imports Google Fonts, and documented credits are spread across several files. Provide a reliable system-font fallback or licensed self-hosted fonts, one asset/source manifest and a short contributor guide covering build, preview, validation and deployment. Done when the atlas remains legible with external fonts blocked and source credits stay synchronized. P2; small.
+
+70. Optional expansion backlog. After the core gates pass, evaluate named asteroids, dwarf planets, comets, search, object comparison, guided tours, shareable view URLs and exportable annotated images. Each addition needs source metadata, appropriate scale rules, loading limits and keyboard access. Start with one representative feature rather than importing a large catalogue. P3; large.
+
+71. Acceptance gate for the next release. Require usable progressive loading, recoverable failures, readable essential labels, visible selected objects, documented clocks, consistent attribution, preserved slow-spin behavior and a saved performance baseline. Run fixed-view visual checks and source validation before packaging. Do not claim optimization success from reduced file size alone.
+
+72. Recommended implementation order. Follow IMPROVEMENT-STEPS.txt. Stabilize and measure first; improve loading and interaction second; improve rendering and parity third; consider new scientific modes and content last. The report is an audit and proposal: no application behavior was changed by preparing it.
+
+SOURCES CHECKED FOR THIS AUDIT
+
+1. [S1] Three.js WebGLRenderer documentation: https://threejs.org/docs/pages/WebGLRenderer.html . Renderer capabilities and instrumentation reference. Documentation is current; implementation must remain compatible with the project's pinned Three.js version.
+
+2. [S2] Three.js KTX2Loader documentation: https://threejs.org/docs/pages/KTX2Loader.html . Compressed texture loading and capability detection.
+
+3. [S3] Three.js InstancedMesh documentation: https://threejs.org/docs/pages/InstancedMesh.html . Instancing, bounds and update behavior.
+
+4. [S4] W3C Understanding WCAG 2.2, Pause, Stop, Hide: https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html . Supports providing an independent way to stop ongoing movement; this report is not a formal accessibility conformance audit.
+
+5. [S5] NASA Moon Facts: https://science.nasa.gov/moon/facts/ . Reference for the Moon's rotation and same-face relationship with Earth.
+
+6. [S6] JPL Horizons manual: https://ssd.jpl.nasa.gov/horizons/manual.html . Reference for a future dated ephemeris mode, frames and output interpretation.
+
+7. Existing project scientific sources remain in dist/environment-sources.json and dist/moon-map-sources.json. This audit does not independently revalidate every numerical value or every image-license entry.

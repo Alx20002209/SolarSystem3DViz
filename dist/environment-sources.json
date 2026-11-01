@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Main asteroid belt",
+    "placement": "Between Mars and Jupiter",
+    "url": "https://science.nasa.gov/solar-system/asteroids/facts/",
+    "note": "Representative miniature rocks, not a catalogue of actual asteroid positions. Display radii 24.9\u201327.55 preserve the gap in the compressed model. Sizes and sample density are enhanced; real asteroids are widely separated."
+  },
+  {
+    "title": "Kuiper Belt",
+    "placement": "Beyond Neptune; main region approximately 30\u201350 AU",
+    "url": "https://science.nasa.gov/solar-system/kuiper-belt/facts/",
+    "note": "An icy small-body population, not a second rocky asteroid belt. Display radii 64\u201378 are compressed. This rendering excludes the scattered disk and Oort Cloud."
+  },
+  {
+    "title": "Zodiacal dust cloud",
+    "placement": "Diffuse inner Solar System disk near the orbital plane",
+    "url": "https://www.nasa.gov/solar-system/what-scientists-found-after-sifting-through-dust-in-the-solar-system/",
+    "note": "Dust scatters sunlight. The warm haze and sparse motes are enhanced explanatory graphics; the rendered outer fade is not a physical boundary."
+  },
+  {
+    "title": "Enceladus water-vapour torus",
+    "placement": "Around Saturn, concentrated near Enceladus\u2019s orbit",
+    "url": "https://www.nature.com/articles/s41550-023-02009-6",
+    "note": "Water vapour from Enceladus spreads into a torus. The blue colour and opacity are illustrative visibility enhancements, not its naked-eye appearance."
+  },
+  {
+    "title": "Saturn E ring and Enceladus plume",
+    "placement": "Diffuse icy ring around Saturn; jets from Enceladus\u2019s south pole",
+    "url": "https://science.nasa.gov/missions/cassini/put-a-ring-on-it/",
+    "note": "Ice grains supply the E ring, while water vapour supplies the gas torus. These are distinct but related components, shown in the same compressed neighbourhood."
+  }
+]

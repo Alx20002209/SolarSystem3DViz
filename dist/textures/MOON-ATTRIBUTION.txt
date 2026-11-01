@@ -1,0 +1,12 @@
+## Moons and environmental layers
+
+Moon maps: NASA/JPL Solar System Simulator texture archive, https://space.jpl.nasa.gov/tmaps/. Viking/Voyager mosaics have gaps and aesthetic enhancements; they are visualization assets, not scientific analysis products. Exact source URLs and credits are retained in dist/moon-map-sources.json.
+Enceladus: Paul Schenk / Lunar and Planetary Institute, Cassini ISS NASA/JPL, https://www.lpi.usra.edu/icy_moons/saturn/enceladus/ (CC BY 4.0). Resized to 2048 x 1024.
+
+The main asteroid belt is between Mars and Jupiter: https://science.nasa.gov/solar-system/asteroids/facts/. The Kuiper Belt is icy small bodies beyond Neptune, with its main region around 30–50 AU: https://science.nasa.gov/solar-system/kuiper-belt/facts/.
+Zodiacal dust is diffuse material close to the solar-system plane: https://www.nasa.gov/solar-system/what-scientists-found-after-sifting-through-dust-in-the-solar-system/.
+The gas layer represents Enceladus's water-vapour torus near its orbit around Saturn, supported by https://www.nature.com/articles/s41550-023-02009-6. The separate icy E ring and south-polar plume are described at https://science.nasa.gov/missions/cassini/put-a-ring-on-it/.
+
+Belts contain 2,700 representative bodies, not a catalogue of individual asteroids. Sizes, spacing, dust density, gas colour and opacity are enhanced for visibility; display distances are compressed. No large colourful nebula is placed in the planetary system. Layers & sources in the app records placements and limitations. Belts and Dust / gas can be toggled independently.
+
+refine_moons.py updates moon materials and isolated GLB assets; environment_blender.py creates editable environmental collections. The main builder calls both, preserving these improvements on regeneration. dist/environment.js handles browser layers; environment-data.json stores deterministic sample bodies.

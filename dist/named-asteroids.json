@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Ceres",
+    "radius": 0.55,
+    "orbit": 26.4,
+    "phase": 0.4,
+    "color": "#a2a29c",
+    "kind": "Dwarf planet",
+    "diameter": "about 950 km",
+    "period": 1800,
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/asteroidfact.html"
+  },
+  {
+    "name": "Vesta",
+    "radius": 0.4,
+    "orbit": 25.2,
+    "phase": 2.0,
+    "color": "#b1a392",
+    "kind": "Asteroid",
+    "diameter": "569 \u00d7 555 \u00d7 453 km",
+    "period": 1800,
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/asteroidfact.html"
+  },
+  {
+    "name": "Pallas",
+    "radius": 0.39,
+    "orbit": 26.5,
+    "phase": 3.7,
+    "color": "#8f9396",
+    "kind": "Asteroid",
+    "diameter": "582 \u00d7 556 \u00d7 500 km",
+    "period": 1800,
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/asteroidfact.html"
+  },
+  {
+    "name": "Hygiea",
+    "radius": 0.34,
+    "orbit": 27.3,
+    "phase": 5.2,
+    "color": "#777d80",
+    "kind": "Asteroid",
+    "diameter": "about 430 km",
+    "period": 1800,
+    "source": "https://eso.org/public/news/eso1918/"
+  }
+]

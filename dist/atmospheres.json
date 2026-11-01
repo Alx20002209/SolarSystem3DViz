@@ -1,0 +1,405 @@
+{
+  "Venus": {
+    "kind": "Dense atmosphere",
+    "summary": "Carbon dioxide dominates the air near the surface.",
+    "rows": [
+      [
+        "Carbon dioxide",
+        "CO₂",
+        "96.5%"
+      ],
+      [
+        "Nitrogen",
+        "N₂",
+        "3.5%"
+      ],
+      [
+        "Sulfur dioxide",
+        "SO₂",
+        "150 ppm"
+      ],
+      [
+        "Argon",
+        "Ar",
+        "70 ppm"
+      ],
+      [
+        "Water vapor",
+        "H₂O",
+        "20 ppm"
+      ]
+    ],
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html",
+    "note": "Near-surface values. Cloud droplets are separate from this gas mixture.",
+    "basis": "Approximate abundance by volume"
+  },
+  "Earth": {
+    "kind": "Atmosphere",
+    "summary": "Nitrogen and oxygen make up almost all of Earth’s dry air.",
+    "rows": [
+      [
+        "Nitrogen",
+        "N₂",
+        "78.08%"
+      ],
+      [
+        "Oxygen",
+        "O₂",
+        "20.95%"
+      ],
+      [
+        "Argon",
+        "Ar",
+        "0.934%"
+      ],
+      [
+        "Carbon dioxide",
+        "CO₂",
+        "420 ppm"
+      ],
+      [
+        "Water vapor",
+        "H₂O",
+        "Variable; typically ~1%"
+      ]
+    ],
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+    "note": "Dry-air reference values from NASA’s 2024 fact sheet; water is listed separately. Carbon dioxide changes over time; this is not a live reading.",
+    "basis": "Approximate abundance by volume"
+  },
+  "Mars": {
+    "kind": "Thin atmosphere",
+    "summary": "A thin, carbon-dioxide-rich atmosphere surrounds Mars.",
+    "rows": [
+      [
+        "Carbon dioxide",
+        "CO₂",
+        "95.1%"
+      ],
+      [
+        "Nitrogen",
+        "N₂",
+        "2.59%"
+      ],
+      [
+        "Argon",
+        "Ar",
+        "1.94%"
+      ],
+      [
+        "Oxygen",
+        "O₂",
+        "0.16%"
+      ],
+      [
+        "Carbon monoxide",
+        "CO",
+        "0.06%"
+      ]
+    ],
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+    "note": "",
+    "basis": "Approximate abundance by volume"
+  },
+  "Jupiter": {
+    "kind": "Gas giant atmosphere",
+    "summary": "Hydrogen and helium dominate; cloud-forming gases occur in smaller amounts.",
+    "rows": [
+      [
+        "Hydrogen",
+        "H₂",
+        "89.8% ± 2.0"
+      ],
+      [
+        "Helium",
+        "He",
+        "10.2% ± 2.0"
+      ],
+      [
+        "Methane",
+        "CH₄",
+        "3,000 ± 1,000 ppm"
+      ],
+      [
+        "Ammonia",
+        "NH₃",
+        "260 ± 40 ppm"
+      ]
+    ],
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html",
+    "note": "Abundances vary with depth. Uncertainties on percentages are percentage points.",
+    "basis": "Approximate abundance by volume"
+  },
+  "Saturn": {
+    "kind": "Gas giant atmosphere",
+    "summary": "A hydrogen-rich atmosphere with helium and trace methane and ammonia.",
+    "rows": [
+      [
+        "Hydrogen",
+        "H₂",
+        "96.3% ± 2.4"
+      ],
+      [
+        "Helium",
+        "He",
+        "3.25% ± 2.4"
+      ],
+      [
+        "Methane",
+        "CH₄",
+        "4,500 ± 2,000 ppm"
+      ],
+      [
+        "Ammonia",
+        "NH₃",
+        "125 ± 75 ppm"
+      ]
+    ],
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/saturnfact.html",
+    "note": "Uncertainties on percentages are percentage points.",
+    "basis": "Approximate abundance by volume"
+  },
+  "Uranus": {
+    "kind": "Ice giant atmosphere",
+    "summary": "The outer atmosphere is mostly hydrogen and helium, with methane.",
+    "rows": [
+      [
+        "Hydrogen",
+        "H₂",
+        "82.5% ± 3.3"
+      ],
+      [
+        "Helium",
+        "He",
+        "15.2% ± 3.3"
+      ],
+      [
+        "Methane",
+        "CH₄",
+        "2.3%"
+      ]
+    ],
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/uranusfact.html",
+    "note": "Outer atmospheric composition, not the composition of the whole planet. Uncertainties are percentage points.",
+    "basis": "Approximate abundance by volume"
+  },
+  "Neptune": {
+    "kind": "Ice giant atmosphere",
+    "summary": "Hydrogen, helium and methane form the main atmospheric mixture.",
+    "rows": [
+      [
+        "Hydrogen",
+        "H₂",
+        "80.0% ± 3.2"
+      ],
+      [
+        "Helium",
+        "He",
+        "19.0% ± 3.2"
+      ],
+      [
+        "Methane",
+        "CH₄",
+        "1.5% ± 0.5"
+      ]
+    ],
+    "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/neptunefact.html",
+    "note": "Independent approximate estimates total slightly over 100%. They are not normalized. Uncertainties are percentage points.",
+    "basis": "Approximate abundance by volume"
+  },
+  "Titan": {
+    "kind": "Dense moon atmosphere",
+    "summary": "A nitrogen atmosphere with methane and an organic haze.",
+    "rows": [
+      [
+        "Nitrogen",
+        "N₂",
+        "About 95%"
+      ],
+      [
+        "Methane",
+        "CH₄",
+        "About 5%"
+      ]
+    ],
+    "source": "https://science.nasa.gov/saturn/moons/titan/facts/",
+    "note": "NASA’s broad composition summary; methane abundance varies with altitude.",
+    "basis": "Approximate abundance by volume"
+  },
+  "Mercury": {
+    "kind": "Thin exosphere",
+    "summary": "A sparse cloud of atoms released from the surface replaces a substantial atmosphere.",
+    "rows": [
+      [
+        "Oxygen",
+        "O",
+        "Reported constituent"
+      ],
+      [
+        "Sodium",
+        "Na",
+        "Reported constituent"
+      ],
+      [
+        "Hydrogen",
+        "H",
+        "Reported constituent"
+      ],
+      [
+        "Helium",
+        "He",
+        "Reported constituent"
+      ],
+      [
+        "Potassium",
+        "K",
+        "Reported constituent"
+      ]
+    ],
+    "source": "https://science.nasa.gov/mercury/facts/",
+    "note": "",
+    "basis": "Selected constituents; no fixed percentages"
+  },
+  "Moon": {
+    "kind": "Thin exosphere",
+    "summary": "Helium, neon and argon dominate the Moon’s extremely sparse exosphere.",
+    "rows": [
+      [
+        "Helium",
+        "He",
+        "Major constituent"
+      ],
+      [
+        "Neon",
+        "Ne",
+        "Major constituent"
+      ],
+      [
+        "Argon",
+        "Ar",
+        "Major constituent"
+      ]
+    ],
+    "source": "https://science.nasa.gov/moon/lunar-atmosphere/",
+    "note": "",
+    "basis": "Selected constituents; abundance varies over time"
+  },
+  "Io": {
+    "kind": "Thin atmosphere",
+    "summary": "Sulfur dioxide is the primary atmospheric constituent.",
+    "rows": [
+      [
+        "Sulfur dioxide",
+        "SO₂",
+        "Dominant"
+      ]
+    ],
+    "source": "https://science.nasa.gov/jupiter/jupiter-moons/io/facts/",
+    "note": "",
+    "basis": "Selected constituent; no fixed percentage"
+  },
+  "Ganymede": {
+    "kind": "Thin atmosphere",
+    "summary": "Observations show a very thin oxygen atmosphere.",
+    "rows": [
+      [
+        "Oxygen",
+        "O₂",
+        "Detected"
+      ]
+    ],
+    "source": "https://science.nasa.gov/jupiter/jupiter-moons/ganymede/facts/",
+    "note": "",
+    "basis": "Selected constituent, not an exhaustive inventory"
+  },
+  "Callisto": {
+    "kind": "Thin exosphere",
+    "summary": "A very thin carbon dioxide exosphere also contains oxygen and hydrogen.",
+    "rows": [
+      [
+        "Carbon dioxide",
+        "CO₂",
+        "Detected"
+      ],
+      [
+        "Oxygen",
+        "—",
+        "Reported"
+      ],
+      [
+        "Hydrogen",
+        "—",
+        "Reported"
+      ]
+    ],
+    "source": "https://science.nasa.gov/jupiter/jupiter-moons/callisto/facts/",
+    "note": "",
+    "basis": "Selected constituents; no fixed percentages"
+  },
+  "Triton": {
+    "kind": "Thin atmosphere",
+    "summary": "Nitrogen dominates, with a small amount of methane.",
+    "rows": [
+      [
+        "Nitrogen",
+        "N₂",
+        "Dominant"
+      ],
+      [
+        "Methane",
+        "CH₄",
+        "Small amount"
+      ]
+    ],
+    "source": "https://science.nasa.gov/neptune/moons/triton/",
+    "note": "",
+    "basis": "Selected constituents; no fixed percentages"
+  },
+  "Enceladus": {
+    "kind": "Escaping plume gas",
+    "summary": "South-polar jets release water vapor and ice particles into space.",
+    "rows": [
+      [
+        "Water vapor",
+        "H₂O",
+        "Detected in plume"
+      ]
+    ],
+    "source": "https://science.nasa.gov/missions/webb/webb-maps-surprisingly-large-plume-jetting-from-saturns-moon-enceladus/",
+    "note": "A localized escaping plume is not a uniform global atmosphere.",
+    "basis": "Selected plume constituent"
+  },
+  "Ceres": {
+    "kind": "Very thin atmosphere",
+    "summary": "There is evidence of water vapor around Ceres.",
+    "rows": [
+      [
+        "Water vapor",
+        "H₂O",
+        "Evidence reported"
+      ]
+    ],
+    "source": "https://science.nasa.gov/dwarf-planets/ceres/facts/",
+    "note": "",
+    "basis": "Selected constituent; no fixed percentage"
+  },
+  "Sun": {
+    "kind": "Stellar plasma",
+    "summary": "Hydrogen and helium dominate the Sun. Its atmosphere includes the chromosphere and corona.",
+    "rows": [
+      [
+        "Hydrogen",
+        "H",
+        "Major element"
+      ],
+      [
+        "Helium",
+        "He",
+        "Major element"
+      ]
+    ],
+    "source": "https://science.nasa.gov/sun/facts/",
+    "note": "Ionization changes between layers. These are elements in stellar material, not a planetary molecular gas mixture.",
+    "basis": "Qualitative elemental composition"
+  }
+}

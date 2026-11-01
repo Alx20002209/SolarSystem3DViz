@@ -1,0 +1,54 @@
+ORBITAL ATLAS — ORDERED IMPROVEMENT STEPS
+Date: 1 November 2026
+Companion: IMPROVEMENT-REPORT.txt
+Follow this sequence. Finish each acceptance check before proceeding to dependent work. Preserve the requested black background, white orbits, slow default motion and ongoing spin during ordinary orbital pause.
+
+1. Preserve a baseline. Back up the current Blender file, source, data and asset manifests. Diagnose the root Git work-tree error without changing its remote. Finish with a recoverable baseline and a documented publication checkout. Report items 3, 68.
+
+2. Record the current build contract. Pin Blender/exporter and Three.js versions; document source units, output directories and commands. Move maintained checks out of ignored scratch folders. Finish when a clean copy runs the existing validation commands. Items 60–61, 65.
+
+3. Capture benchmark scenes. Use fixed times and cameras for overview, Earth, Saturn, Io and Enceladus. Record network bytes, time to usable scene, frame-time percentiles, draw calls and texture counts on a named desktop and mobile device. Finish with a baseline file, not estimated performance. Items 6, 8, 48, 66.
+
+4. Correct documentation first. Reconcile the old moon-attribution statement with current maps, distinguish physical and display units, and explain the two orbital clocks. Finish when UI, README and manifests agree. Items 4, 26, 33–34.
+
+5. Add startup recovery. Wrap data/graphics startup, track secondary texture loading, and provide per-object fallbacks and retry. Test an unavailable JSON file, one failed GLB, one missing texture and unavailable WebGL. Finish when none leaves an unexplained permanent loading screen. Items 10–11.
+
+6. Introduce progressive loading. Render a small usable overview first; load the selected system before unrelated moons. Keep loading progress accessible. Finish when users can navigate before all 22 moon assets finish. Item 9; depends on step 5.
+
+7. Separate authoring assets from deployment assets. Generate a runtime dependency manifest, retain originals in the authoring tree and omit unused previews/source maps from publication. Finish with verified runtime references and a smaller measured payload. Item 51; depends on step 6.
+
+8. Repair selection edge cases. Reveal moons when selected, unify navigation and canvas behavior, and handle pointer cancellation and multi-touch. Add stable body IDs while retaining interactableObjects. Finish with passing select/inspect tests for visible and hidden systems. Items 17–20.
+
+9. Redesign camera modes. Implement overview, system view and surface inspection with interruptible transitions, target bounds and safe zoom limits. Finish when Saturn's rings, Enceladus's plume and small moons frame correctly. Items 5, 15–16.
+
+10. Fix label congestion. Add priorities, panel exclusion areas, screen bounds and collision handling. Fade irrelevant orbit lines in inspection mode while keeping them white. Finish with readable fixed screenshots at desktop and narrow widths. Items 12–14.
+
+11. Make the narrow-screen layout usable. Replace competing fixed panels with a collapsible detail sheet and layer menu. Enlarge small touch targets and verify 320–768-pixel layouts, landscape and text zoom. Finish when controls neither overlap nor hide the inspected body. Items 21–22.
+
+12. Add full-motion control and keyboard polish. Preserve ordinary orbit pause, add Freeze all motion, respect reduced-motion settings, expose selected moon state, and verify dialog focus return. Finish with a keyboard-only walkthrough and an entirely stationary view option. Items 23–24.
+
+13. Extract and validate clocks and transforms. Document presentation-time behavior, finer speed presets, low-frame-rate handling, coordinate conversion, pole conventions and Blender/browser phase mapping. Finish with deterministic tests at multiple times and frame rates. Items 25–27, 30–32.
+
+14. Validate the existing moon surfaces. Produce a 22-moon contact sheet, check map orientation/seams, and verify Enceladus's plume remains at the intended pole. Finish with an approved provenance and orientation record for each moon. Items 38–39, 44.
+
+15. Reduce avoidable frame work. Stop hidden-layer updates, cache UI values and textures, reuse vectors/arrays and clamp anisotropy to hardware capability. Finish with a before/after CPU and allocation comparison and unchanged orbit results. Items 52–56.
+
+16. Add quality presets and lifecycle recovery. Tune render scale, MSAA, bloom and particle budgets; update pixel-ratio uniforms on display changes; define hidden-tab behavior and context-loss recovery. Finish when selected low-power devices meet the agreed usability budget. Items 57–59.
+
+17. Optimize geometry and texture delivery. Export useful levels of detail; evaluate compressed geometry and KTX2 textures on representative devices. Compare decode time, memory and surface quality. Adopt only changes with measured benefit. Items 49–50; depends on steps 3, 6, 16.
+
+18. Refine lighting and individual materials. Improve Earth's water mask, restrained rocky relief, per-world atmospheres, ring response and selective shadow/eclipse effects. Finish with approved side-by-side views that retain the performance budget. Items 35–37, 41–42.
+
+19. Refine the Sun and environmental effects. Break repetitive prominence patterns, reduce obvious gas blobs, tune plume depth/opacity and isolate dust/gas/E-ring controls. Address artificial star parallax and document representative belt distributions. Finish when both overview and close-up remain clear. Items 40, 43, 45–47.
+
+20. Make Blender rebuilds safe and repeatable. Separate generated and artist-owned collections, maintain required source inputs outside scratch, and make refinement idempotent. Run twice in a temporary copy. Finish when authored edits have a supported export route and builds agree. Items 31–32, 62–63.
+
+21. Consolidate maintained source and tests. Split loading, state, camera, animation and rendering modules; add schema and behavioral tests plus fixed-view screenshots. Replace source-string motion tests with direct module tests. Finish when one documented command validates a clean checkout. Items 60–66.
+
+22. Verify publication and repeat visits. Check cache headers and version strategy, publish an exact validated source state, and test both fresh and returning clients. Preserve the site's current audience. Finish when source, archive and hosted release identify the same version. Items 67–69.
+
+23. Decide on optional science mode. Only after the core release passes, add synchronized rotation for applicable moons and, if useful, an independently validated date-based JPL ephemeris view. Keep presentation mode and its slow spin available. Finish with explicit mode labels and reference-data comparisons. Items 28–29.
+
+24. Add content selectively. Choose one next feature such as named asteroids, dwarf planets, guided tours or shareable views. Require source metadata, loading limits, keyboard access and a clear benefit before adding more. Finish with the same acceptance gate used for the core release. Items 7, 70–71.
+
+25. Close each improvement cycle with evidence. Record what changed, benchmark deltas, visual comparisons, tests run and known limitations. Update the report priorities from results. Do not mark a step complete solely because its code has been written.

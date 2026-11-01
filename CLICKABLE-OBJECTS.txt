@@ -1,0 +1,43 @@
+CLICKABLE OBJECTS - 35 TOTAL
+
+Click a body or asteroid sign to center, zoom and follow. Overview restores the full system.
+
+1. Sun - Star
+2. Mercury - Planet
+3. Venus - Planet
+4. Earth - Planet
+5. Mars - Planet
+6. Jupiter - Planet
+7. Saturn - Planet
+8. Uranus - Planet
+9. Neptune - Planet
+10. Moon - Moon of Earth
+11. Phobos - Moon of Mars
+12. Deimos - Moon of Mars
+13. Io - Moon of Jupiter
+14. Europa - Moon of Jupiter
+15. Ganymede - Moon of Jupiter
+16. Callisto - Moon of Jupiter
+17. Mimas - Moon of Saturn
+18. Enceladus - Moon of Saturn
+19. Tethys - Moon of Saturn
+20. Dione - Moon of Saturn
+21. Rhea - Moon of Saturn
+22. Titan - Moon of Saturn
+23. Iapetus - Moon of Saturn
+24. Ariel - Moon of Uranus
+25. Umbriel - Moon of Uranus
+26. Titania - Moon of Uranus
+27. Oberon - Moon of Uranus
+28. Miranda - Moon of Uranus
+29. Triton - Moon of Neptune
+30. Proteus - Moon of Neptune
+31. Nereid - Moon of Neptune
+32. Ceres - Dwarf planet / main belt
+33. Vesta - Asteroid / main belt
+34. Pallas - Asteroid / main belt
+35. Hygiea - Asteroid / main belt
+
+Anonymous belt rocks, gas, dust, stars, rings and orbit lines are not individual click targets. Named objects remain visible when anonymous belts are off. Asteroid close-up hides anonymous rocks for clarity.
+Moon spin: one turn every 180 seconds, even during orbital pause. Illustrative rotation, not tidal locking.
+Named-body shape, surface, size, circular display orbit, phase and 1800-day animation period are illustrative. Dimensions cite NASA 2019 fact sheet or ESO 2019 for Hygiea.
