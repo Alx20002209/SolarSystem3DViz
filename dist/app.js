@@ -25,7 +25,7 @@ async function data(file){const r=await fetch(file);if(!r.ok)throw Error(file+' 
 const [planets,moonData,environmentData,environmentSources]=await Promise.all([data('./planets.json'),data('./moons.json'),data('./environment-data.json'),data('./environment-sources.json')]);
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x000000);
 const camera=new THREE.PerspectiveCamera(43,innerWidth/innerHeight,.05,2000);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 $('universe').append(renderer.domElement);
 const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=.5;controls.maxDistance=340;controls.maxPolarAngle=Math.PI*.98;
 // A display-balanced point light keeps the compressed outer planets readable.
@@ -37,7 +37,8 @@ const DAY_MS=86400000,J2000_MS=Date.UTC(2000,0,1,12),MIN_DATE_DAYS=Math.round((D
 let selected=2,selectedMoon=null,selectedAsteroid=null,following=false,paused=false,days=Math.max(MIN_DATE_DAYS,Math.min(MAX_DATE_DAYS,(Date.now()-J2000_MS)/DAY_MS)),spinSeconds=0,effectTime=0,names=true,moonsVisible=true;
 const dateSlider=$('date'),datePicker=$('date-picker');
 dateSlider.min=String(MIN_DATE_DAYS);dateSlider.max=String(MAX_DATE_DAYS);dateSlider.value=String(Math.round(days));days=Number(dateSlider.value);
-function updateDateControls(){const day=Math.round(days),value=String(day);if(dateSlider.value!==value)dateSlider.value=value;datePicker.value=new Date(J2000_MS+day*DAY_MS).toISOString().slice(0,10);$('date-prev-month').disabled=day<=MIN_DATE_DAYS;$('date-next-month').disabled=day>=MAX_DATE_DAYS}
+let displayedDateDay=NaN;
+function updateDateControls(){const day=Math.round(days);if(day===displayedDateDay)return;displayedDateDay=day;const value=String(day);if(dateSlider.value!==value)dateSlider.value=value;datePicker.value=new Date(J2000_MS+day*DAY_MS).toISOString().slice(0,10);$('date-prev-month').disabled=day<=MIN_DATE_DAYS;$('date-next-month').disabled=day>=MAX_DATE_DAYS}
 function selectDate(day){days=Math.max(MIN_DATE_DAYS,Math.min(MAX_DATE_DAYS,Math.round(day)));paused=true;$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement');updateDateControls()}
 function shiftDateByMonth(offset){const current=new Date(J2000_MS+Math.round(days)*DAY_MS),day=current.getUTCDate(),target=new Date(Date.UTC(current.getUTCFullYear(),current.getUTCMonth()+offset,1,12)),lastDay=new Date(Date.UTC(target.getUTCFullYear(),target.getUTCMonth()+1,0,12)).getUTCDate();target.setUTCDate(Math.min(day,lastDay));selectDate((target.getTime()-J2000_MS)/DAY_MS)}
 function dateInputToDay(value){const [year,month,day]=value.split('-').map(Number);return (Date.UTC(year,month-1,day,12)-J2000_MS)/DAY_MS}
@@ -121,13 +122,13 @@ $('environment-info').onclick=()=>$('environment-dialog').showModal();$('close-e
 for(const item of environmentSources){const section=document.createElement('section');section.className='source-item';const heading=document.createElement('h3');heading.textContent=item.title;const placement=document.createElement('strong');placement.textContent=item.placement;const note=document.createElement('p');note.textContent=item.note;const link=document.createElement('a');link.href=item.url;link.target='_blank';link.rel='noopener';link.textContent='Read the scientific source ↗';section.append(heading,placement,note,link);$('environment-sources').append(section)}
 $('about').onclick=()=>$('model-info').showModal();$('close-about').onclick=()=>$('model-info').close();
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight)});
-scene.updateMatrixWorld(true);overview();$('loading').remove();const clock=new THREE.Clock(),v=new THREE.Vector3(),old=new THREE.Vector3(),temp=new THREE.Vector3();
+scene.updateMatrixWorld(true);overview();$('loading').remove();const clock=new THREE.Clock(),v=new THREE.Vector3(),old=new THREE.Vector3(),temp=new THREE.Vector3(),beltUpdateInterval=.25;let beltUpdateElapsed=beltUpdateInterval;
 function placeLabel(el,position,offset,visible=true){v.copy(position);v.y+=offset;v.project(camera);el.style.display=names&&visible&&v.z<1&&v.z>-1?'block':'none';el.style.transform=`translate(${(v.x*.5+.5)*innerWidth}px,${(-v.y*.5+.5)*innerHeight}px) translate(-50%,-100%)`}
-function animate(){requestAnimationFrame(animate);const frameDt=Math.min(clock.getDelta(),.05),dt=menu.isOpen?0:frameDt,rate=Number($('time').value);if(!paused){days=Math.min(MAX_DATE_DAYS,days+dt*rate);if(days>=MAX_DATE_DAYS){paused=true;$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement')}}spinSeconds+=dt;effectTime+=dt*.35;old.copy(selectedPosition());
+function animate(){requestAnimationFrame(animate);const elapsed=clock.getDelta(),frameDt=Math.min(elapsed,.05),dt=menu.isOpen?0:frameDt,rate=Number($('time').value);beltUpdateElapsed+=menu.isOpen?0:Math.min(elapsed,.5);const refreshBelts=beltUpdateElapsed>=beltUpdateInterval;if(refreshBelts)beltUpdateElapsed%=beltUpdateInterval;if(!paused){days=Math.min(MAX_DATE_DAYS,days+dt*rate);if(days>=MAX_DATE_DAYS){paused=true;$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement')}}spinSeconds+=dt;effectTime+=dt*.35;old.copy(selectedPosition());
  bodies.forEach((b,i)=>{b.root.position.fromArray(planetPositionAt(planets[i],i,days));b.model.rotation.y=(TAU*24*days/Math.abs(planets[i].rotation))%TAU;if(b.model.userData.clouds)b.model.userData.clouds.rotation.y=b.model.rotation.y*1.035});
  moons.forEach(m=>{m.node.position.fromArray(positionAt(m.orbitData,days,m.phase));m.model.rotation.y=TAU*spinSeconds/180;m.plane.visible=moonsVisible;m.line.visible=orbitGroup.visible&&m.parentIndex===selected&&following});environment.belts.visible=environment.beltsOn&&!(following&&selectedAsteroid);asteroids.update(days,spinSeconds);solar.update(effectTime);scene.updateMatrixWorld(true);
  for(const b of beltObstacles){b.node.getWorldPosition(obstaclePosition);b.x=obstaclePosition.x;b.y=obstaclePosition.y;b.z=obstaclePosition.z;}
- environment.update(days,spinSeconds,beltObstacles);
+ environment.update(days,spinSeconds,beltObstacles,refreshBelts);
  if(cameraFlight){
   const f=cameraFlight;f.elapsed+=dt;
   const pose=sampleFlight(f.from,f.lookFrom,f.direction,f.distance,selectedPosition().toArray(),f.elapsed/f.duration);

@@ -23,11 +23,13 @@ export function createEnvironment(scene,bodies,moons,data){
  const plumeGroup=new THREE.Group();plumeGroup.name='Enceladus south-polar vapour and ice';enceladus.node.add(plumeGroup);const plumePos=[];for(let i=0;i<480;i++){const h=random()**1.5*enceladus.radius*5,a=random()*TAU,w=(.025+h*.16)*random();plumePos.push(Math.cos(a)*w,-enceladus.radius-h,Math.sin(a)*w)}const plumeParticles=cloud(plumePos,0xc5e5f1,.025,.65);plumeGroup.add(plumeParticles);const plumeSeeds=plumePos.slice();
  const annotations=[{text:'MAIN ASTEROID BELT',position:new THREE.Vector3(-20,0,20)},{text:'KUIPER BELT · ICY BODIES',position:new THREE.Vector3(-67,0,-20)}];
  let beltsOn=true,dustOn=true;
- return {belts,dust,torus,plumeGroup,annotations,setBelts(on){beltsOn=on;belts.visible=on},setDust(on){dustOn=on;dust.visible=on;torus.visible=on;plumeGroup.visible=on},get beltsOn(){return beltsOn},get dustOn(){return dustOn},update(days,seconds,obstacles=[]){
+return {belts,dust,torus,plumeGroup,annotations,setBelts(on){beltsOn=on;belts.visible=on},setDust(on){dustOn=on;dust.visible=on;torus.visible=on;plumeGroup.visible=on},get beltsOn(){return beltsOn},get dustOn(){return dustOn},update(days,seconds,obstacles=[],refreshBelts=true){
+ if(beltsOn&&refreshBelts){
   const grid=createRockGrid();
   for(const field of fields){field.objects.forEach((a,i)=>{const phase=a.phase+days/a.period*TAU;dummy.position.set(a.a*Math.cos(phase),Math.sin(phase)*a.a*a.inclination,a.a*Math.sin(phase));dummy.rotation.set(a.phase+seconds*.001,a.phase*.7+seconds*.002,a.phase*.3);const radius=a.size*Math.max(...a.stretch)*1.14;let scale=clearanceScale(dummy.position.x,dummy.position.y,dummy.position.z,radius,obstacles);
  if(scale>0&&!grid.accept(dummy.position.x,dummy.position.y,dummy.position.z,radius))scale=0;
  dummy.scale.set(a.size*a.stretch[0]*scale,a.size*a.stretch[1]*scale,a.size*a.stretch[2]*scale);dummy.updateMatrix();field.mesh.setMatrixAt(i,dummy.matrix)});field.mesh.instanceMatrix.needsUpdate=true}
+ }
   dust.rotation.y=days/365.2*.0005;
   torus.rotation.y=seconds*.002;
   const pp=plumeParticles.geometry.attributes.position;for(let i=0;i<pp.count;i++){const h=((-plumeSeeds[i*3+1]-enceladus.radius)+seconds*enceladus.radius*.12)%(enceladus.radius*5);const spread=.2+h/(enceladus.radius*5);pp.setXYZ(i,plumeSeeds[i*3]*spread,-enceladus.radius-h,plumeSeeds[i*3+2]*spread)}pp.needsUpdate=true;
