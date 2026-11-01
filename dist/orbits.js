@@ -22,12 +22,13 @@ const planetaryElements = [
   [30.06992276,.00026291,.00859048,.00005105,1.77004347,.00035372,-55.12002969,218.45945325,44.96476227,-.32241464,131.78422574,-.00508664]
 ];
 
-export function planetPositionAt(p, index, days) {
+function planetPositionFromElements(p, index, T, meanAnomaly=null) {
   const [a0,aRate,e0,eRate,i0,iRate,l0,lRate,peri0,periRate,node0,nodeRate]=planetaryElements[index];
-  const T=days/36525,a=a0+aRate*T,e=e0+eRate*T,i=(i0+iRate*T)*Math.PI/180;
-  const longitude=(l0+lRate*T)*Math.PI/180,peri=(peri0+periRate*T)*Math.PI/180,node=(node0+nodeRate*T)*Math.PI/180;
-  const meanAnomaly=((longitude-peri+Math.PI)%(TAU)+TAU)%(TAU)-Math.PI;
-  const E=eccentricAnomaly(meanAnomaly,e),x=a*(Math.cos(E)-e),y=a*Math.sqrt(1-e*e)*Math.sin(E),w=peri-node;
+  const a=a0+aRate*T,e=e0+eRate*T,i=(i0+iRate*T)*Math.PI/180;
+  const peri=(peri0+periRate*T)*Math.PI/180,node=(node0+nodeRate*T)*Math.PI/180;
+  const longitude=(l0+lRate*T)*Math.PI/180;
+  const anomaly=meanAnomaly??(((longitude-peri+Math.PI)%(TAU)+TAU)%(TAU)-Math.PI);
+  const E=eccentricAnomaly(anomaly,e),x=a*(Math.cos(E)-e),y=a*Math.sqrt(1-e*e)*Math.sin(E),w=peri-node;
   const cw=Math.cos(w),sw=Math.sin(w),cn=Math.cos(node),sn=Math.sin(node),ci=Math.cos(i),si=Math.sin(i);
   const scale=p.orbit/a0;
   return [
@@ -35,4 +36,12 @@ export function planetPositionAt(p, index, days) {
     (sw*si*x+cw*si*y)*scale,
     ((cw*sn+sw*cn*ci)*x+(-sw*sn+cw*cn*ci)*y)*scale
   ];
+}
+
+export function planetPositionAt(p,index,days) {
+  return planetPositionFromElements(p,index,days/36525);
+}
+
+export function planetOrbitAt(p,index,meanAnomaly) {
+  return planetPositionFromElements(p,index,0,meanAnomaly);
 }
