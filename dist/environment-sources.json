@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Main asteroid belt",
+    "placement": "Between Mars and Jupiter",
+    "url": "https://science.nasa.gov/mission/dawn/faq/",
+    "note": "Representative population sampled from 2.2–3.2 AU on the common linear distance scale. Synthetic rock sizes and phases are illustrative; this is not an asteroid catalogue."
+  },
+  {
+    "title": "Kuiper Belt",
+    "placement": "Beyond Neptune; main region approximately 30–50 AU",
+    "url": "https://science.nasa.gov/solar-system/kuiper-belt/facts/",
+    "note": "Sampled between 30 and 50 AU using the same linear scale. The scattered disk and Oort Cloud are excluded. Population and object sizes are illustrative."
+  },
+  {
+    "title": "Zodiacal dust cloud",
+    "placement": "Diffuse inner Solar System disk near the orbital plane",
+    "url": "https://www.nasa.gov/solar-system/what-scientists-found-after-sifting-through-dust-in-the-solar-system/",
+    "note": "Dust scatters sunlight. The warm haze and sparse motes are enhanced explanatory graphics; the rendered outer fade is not a physical boundary."
+  },
+  {
+    "title": "Enceladus water-vapour torus",
+    "placement": "Around Saturn, concentrated near Enceladus’s orbit",
+    "url": "https://www.nature.com/articles/s41550-023-02009-6",
+    "note": "Water vapour from Enceladus spreads into a torus. The blue colour and opacity are illustrative visibility enhancements, not its naked-eye appearance."
+  },
+  {
+    "title": "Saturn E ring and Enceladus plume",
+    "placement": "Diffuse icy ring around Saturn; jets from Enceladus’s south pole",
+    "url": "https://science.nasa.gov/missions/cassini/put-a-ring-on-it/",
+    "note": "Ice grains supply the E ring, while water vapour supplies the gas torus. These are distinct but related components, shown in the same physical neighbourhood."
+  }
+]
