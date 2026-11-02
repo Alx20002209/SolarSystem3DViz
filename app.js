@@ -123,6 +123,7 @@ renderer.domElement.addEventListener('wheel',cancelFlight,{capture:true,passive:
 
 for(const [i,p] of [[-1,{name:'Sun',color:'#ff9b35'}],...planets.map((p,i)=>[i,p])]){const button=document.createElement('button');button.dataset.index=i;button.innerHTML=`<span class="dot" style="background:${p.color}"></span>${p.name}`;button.onclick=()=>selectPlanet(i);$('planet-nav').append(button)}
 const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();let down;
+renderer.domElement.addEventListener('pointercancel',()=>{down=null});
 renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY]});renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5){down=null;return}down=null;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);const visible=interactableObjects.filter(o=>{let p=o;while(p){if(!p.visible)return false;p=p.parent}return true});raycaster.intersectObjects(visible,false)[0]?.object.userData.onClick?.()});
 function overview(top=false,inner=false){cancelFlight();following=false;systemView=false;controls.minDistance=.000001;const extent=realisticScale?(inner?240:3700):64;camera.position.set(top?0:extent*1.6,top?extent*3.2:extent*2,top?.01:extent*2.2);if(innerWidth<650)camera.position.multiplyScalar(1.3);controls.target.set(0,0,0);controls.update();showDetails()}
 $('scale-mode').textContent=realisticScale?'Realistic Scale ✓':'Realistic Scale';$('scale-mode').setAttribute('aria-pressed',String(realisticScale));$('scale-mode').title=realisticScale?'Return to the previous illustrative scale':'Use true relative distances and sizes';
@@ -167,3 +168,5 @@ function animate(){requestAnimationFrame(animate);const elapsed=clock.getDelta()
  bodies.forEach((b,i)=>placeLabel(b.label,b.root.position,planets[i].radius*1.25));moons.forEach(m=>{m.node.getWorldPosition(temp);placeLabel(m.label,temp,m.radius*1.25,moonsVisible&&m.parentIndex===selected&&following)});placeLabel(sunLabel,new THREE.Vector3(),sunRadius*1.2);asteroids.items.forEach(a=>placeLabel(a.label,a.root.position,a.radius*1.25,!following||selectedAsteroid===a));environmentLabels.forEach(a=>placeLabel(a.label,a.position,1,environment.beltsOn&&!following));updateDateControls();composer.render();}animate();
 window.solarSystem={scene,camera,controls,bodies,moons,planets,interactableObjects,asteroids,get days(){return days}};
 
+
+window.dispatchEvent(new Event('solar-ready'));
