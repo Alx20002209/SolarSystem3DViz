@@ -1,0 +1,128 @@
+{
+  "Phobos": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/mar1kuu2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/mars.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/phobos.jpg"
+  },
+  "Deimos": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/mar2kuu2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/mars.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/deimos.jpg"
+  },
+  "Io": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/jup1vss2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/jupiter.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/io.jpg"
+  },
+  "Europa": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/jup2vss2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/jupiter.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/europa.jpg"
+  },
+  "Ganymede": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/jup3vss2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/jupiter.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/ganymede.jpg"
+  },
+  "Callisto": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/jup4vss2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/jupiter.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/callisto.jpg"
+  },
+  "Mimas": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/sat1vss2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/saturn.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/mimas.jpg"
+  },
+  "Enceladus": {
+    "file": "moon-maps/enceladus.jpg",
+    "page": "https://www.lpi.usra.edu/icy_moons/saturn/enceladus/",
+    "url": "https://www.lpi.usra.edu/icy_moons/images/esmap-cyl-KH.jpg",
+    "credit": "Paul Schenk / Lunar and Planetary Institute; NASA/JPL Cassini ISS, CC BY 4.0",
+    "note": "Cassini global mosaic resized to 2048 \u00d7 1024."
+  },
+  "Tethys": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/sat3vss2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/saturn.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/tethys.jpg"
+  },
+  "Dione": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/sat4vss2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/saturn.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/dione.jpg"
+  },
+  "Rhea": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/sat5vss2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/saturn.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/rhea.jpg"
+  },
+  "Iapetus": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/sat8vss2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/saturn.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/iapetus.jpg"
+  },
+  "Ariel": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/ura1vuu2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/uranus.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/ariel.jpg"
+  },
+  "Umbriel": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/ura2vuu2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/uranus.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/umbriel.jpg"
+  },
+  "Titania": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/ura3vuu2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/uranus.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/titania.jpg"
+  },
+  "Oberon": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/ura4vuu2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/uranus.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/oberon.jpg"
+  },
+  "Miranda": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/ura5vuu2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/uranus.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/miranda.jpg"
+  },
+  "Triton": {
+    "url": "https://space.jpl.nasa.gov/tmaps/pix/nep1vuu2.jpg",
+    "page": "https://space.jpl.nasa.gov/tmaps/neptune.html",
+    "credit": "NASA/JPL/Caltech/USGS; Voyager or Viking mosaics",
+    "note": "Spacecraft mosaic; coverage gaps and aesthetic processing in source. Not a measured elevation map.",
+    "file": "moon-maps/triton.jpg"
+  }
+}
