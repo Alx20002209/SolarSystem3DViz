@@ -1,3 +1,4 @@
+import {renderResolution} from './render-resolution.js';
 import {planetRotationAt,earthCloudRotationAt,simulationDelta} from './rotation.js';
 import {scaleBody,scaleEnvironment,systemExtent,SUN_RADIUS} from './scale.js';
 import {createAtmospherePanel} from './atmosphere.js';
@@ -33,7 +34,7 @@ const [rawPlanets,rawMoons,rawEnvironment,environmentSources]=await Promise.all(
 const planets=rawPlanets.map(displayBody),moonData=rawMoons.map(displayBody),environmentData=realisticScale?scaleEnvironment(rawEnvironment):rawEnvironment;
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x000000);
 const camera=new THREE.PerspectiveCamera(43,innerWidth/innerHeight,.05,2000);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(renderResolution(innerWidth,innerHeight,devicePixelRatio,matchMedia('(pointer:coarse)').matches).pixelRatio);renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 $('universe').append(renderer.domElement);
 const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=.5;controls.maxDistance=24000;controls.maxPolarAngle=Math.PI*.98;
 // A display-balanced point light keeps the compressed outer planets readable.
@@ -141,7 +142,23 @@ $('dust-gas').onclick=()=>{environment.setDust(!environment.dustOn);$('dust-gas'
 $('environment-info').onclick=()=>$('environment-dialog').showModal();$('close-environment').onclick=()=>$('environment-dialog').close();
 for(const item of environmentSources){if(!realisticScale)item.note+=' In Illustrative Scale, this region is compressed to the previous display layout.';const section=document.createElement('section');section.className='source-item';const heading=document.createElement('h3');heading.textContent=item.title;const placement=document.createElement('strong');placement.textContent=item.placement;const note=document.createElement('p');note.textContent=item.note;const link=document.createElement('a');link.href=item.url;link.target='_blank';link.rel='noopener';link.textContent='Read the scientific source ↗';section.append(heading,placement,note,link);$('environment-sources').append(section)}
 $('about').onclick=()=>$('model-info').showModal();$('close-about').onclick=()=>$('model-info').close();
-window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight)});
+const phonePointer=matchMedia('(pointer:coarse)');
+let lastRenderSize='';
+function resizeScene(){
+ const rect=document.querySelector('#universe').getBoundingClientRect();
+ const size=renderResolution(rect.width,rect.height,devicePixelRatio,phonePointer.matches);
+ const key=`${size.width}/${size.height}/${size.pixelRatio}`;
+ if(key===lastRenderSize)return;
+ lastRenderSize=key;
+ camera.aspect=size.width/size.height;camera.updateProjectionMatrix();
+ renderer.setPixelRatio(size.pixelRatio);renderer.setSize(size.width,size.height);
+ composer.setPixelRatio(size.pixelRatio);composer.setSize(size.width,size.height);
+}
+new ResizeObserver(resizeScene).observe(document.querySelector('#universe'));
+window.addEventListener('resize',resizeScene);
+window.visualViewport?.addEventListener('resize',resizeScene);
+phonePointer.addEventListener('change',resizeScene);
+resizeScene();
 scene.updateMatrixWorld(true);overview();$('loading').remove();const clock=new THREE.Clock(),v=new THREE.Vector3(),old=new THREE.Vector3(),temp=new THREE.Vector3(),beltUpdateInterval=.25;let beltUpdateElapsed=beltUpdateInterval;let orbitDay=NaN;
 document.addEventListener('visibilitychange',()=>clock.start());
 function placeLabel(el,position,offset,visible=true){v.copy(position);v.y+=offset;v.project(camera);el.style.display=names&&visible&&v.z<1&&v.z>-1?'block':'none';el.style.transform=`translate(${(v.x*.5+.5)*innerWidth}px,${(-v.y*.5+.5)*innerHeight}px) translate(-50%,-100%)`}
