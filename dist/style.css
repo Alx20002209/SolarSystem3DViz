@@ -25,3 +25,46 @@ header #environment-info{margin-left:auto}header #about{margin-left:0}.scene-act
 #system-view{width:100%;font-size:11px;margin-top:8px}#system-view[hidden]{display:none}.body-marker{pointer-events:auto}.body-marker button{border:0;font-size:10px;padding:3px 5px;background:#0009;color:inherit}.body-marker button::before{content:"·";color:var(--mint);margin-right:4px}.moon-label.body-marker button{font-size:9px}.body-marker button:hover{background:#163025;color:var(--mint)}
 
 #scale-mode[aria-pressed="true"]{border-color:var(--mint);color:var(--mint)}#inner[hidden]{display:none}
+
+/* Phone layout: keep the scene visible above a compact, measured control dock. */
+@media(max-width:650px), (max-height:500px) and (max-width:950px){
+ :root{--dock-height:190px;--action-height:52px}
+ body{overscroll-behavior:none}
+ header{padding:calc(6px + env(safe-area-inset-top)) 12px 6px;gap:4px}
+ header .brand{font-size:11px;letter-spacing:.5px;white-space:nowrap}
+ .brand .logo{font-size:24px;margin-right:0}
+ header button{min-height:44px;padding:6px;font-size:10px!important}
+ .intro{top:calc(68px + env(safe-area-inset-top));left:16px;max-width:80vw}
+ .intro h1{font-size:22px}.intro .eyebrow{display:none}
+ body:has(#detail:not([hidden])) .intro{display:none}
+ footer{padding-bottom:env(safe-area-inset-bottom)}
+ #planet-nav{padding:0 6px;justify-content:flex-start;overflow-x:auto;scrollbar-width:none}
+ #planet-nav button{min-height:44px;flex-shrink:0;padding:10px 13px;font-size:12px}
+ .timeline{display:flex;flex-direction:column;gap:4px;padding:4px 10px 6px}
+ .playback-control{display:grid;grid-template-columns:44px minmax(76px,1fr) 54px 74px;gap:4px;width:100%}
+ .playback-control .time-label{min-width:0}.playback-control .time-label strong{font-size:11px}
+ .playback-control #time{grid-column:1/-1;grid-row:2;width:100%;min-width:0;height:24px;margin:0}
+ .playback-control button{min-height:44px;padding:6px;font-size:12px}
+ .playback-control #play{width:44px;padding:6px}.playback-control .hint{display:none}
+ .date-control{width:100%;max-width:none;flex-basis:auto;gap:6px}
+ .date-label input{width:132px;height:44px;font-size:16px;padding:4px}
+ .date-control .month-step{height:44px;width:36px}
+ .timeline #date{height:32px;min-width:30px}
+ .scene-actions{left:0;right:0;bottom:var(--dock-height);width:100%;max-width:none;height:var(--action-height);padding:4px 10px;display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:6px;background:#080808ed;scrollbar-width:none}
+ .scene-actions button{min-height:44px;flex:none;font-size:11px;padding:8px 12px;white-space:nowrap}
+ #detail{left:10px;right:10px;top:auto;bottom:calc(var(--dock-height) + var(--action-height) + 8px);width:auto;padding:12px;max-height:min(34dvh,calc(100dvh - var(--dock-height) - var(--action-height) - 80px));overflow:auto;overscroll-behavior:contain}
+ #detail h2{font-size:26px;margin:4px 0 8px}#detail .eyebrow{font-size:9px}
+ #close-detail{min-width:44px;min-height:44px;padding:8px;font-size:26px}
+ #detail .stats{grid-template-columns:1fr 1fr;gap:6px 16px}
+ #detail .stats strong{font-size:15px}#detail .stats span{font-size:9px}
+ #detail button:not(#close-detail){min-height:44px;font-size:12px}
+ #moon-list{max-height:none}#moon-list button{min-width:44px;padding:8px 10px}
+ .surface-source{font-size:11px}dialog,#pause-menu,#atmosphere-dialog,#environment-dialog{max-width:calc(100vw - 24px);max-height:calc(100dvh - 32px);padding:20px;overflow:auto;overscroll-behavior:contain}
+ dialog button{min-width:44px;min-height:44px}dialog h2{font-size:28px}
+ .body-marker button{min-height:32px;padding:6px;font-size:11px}
+}
+@media(max-height:500px) and (max-width:950px){
+ .intro{display:none}.timeline{flex-direction:row;align-items:center}
+ .playback-control{width:52%;flex:1}.date-control{width:44%;flex:1}
+ #detail{left:auto;right:10px;width:280px;max-height:calc(100dvh - var(--dock-height) - var(--action-height) - 72px)}
+}
