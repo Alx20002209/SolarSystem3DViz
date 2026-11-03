@@ -1,0 +1,23 @@
+{
+  "source": "NASA/JPL Horizons API, geometric vectors in ecliptic J2000.0. Epoch state vectors are JDTDB 2451545.0 (2000-01-01 12:00 TDB); Titan also has a 2028-07-05 00:00 TDB phase-calibration vector. The saved states use two-body propagation and JPL mean periods.",
+  "epochTdbJulianDate": 2451545.0,
+  "Moon": {
+    "parent": "Earth",
+    "muKm3S2": 398600.435507,
+    "periodDays": 27.321661,
+    "positionKm": [-291608.3841877129, -274979.7416731504, 36271.19662699287],
+    "velocityKmS": [0.6435313889889519, -0.7309839826871004, -0.01150646473918648]
+  },
+  "Titan": {
+    "parent": "Saturn",
+    "muKm3S2": 37931207.8,
+    "periodDays": 15.945448,
+    "positionKm": [-946802.9384488795, 766868.0317005697, -302959.9876766361],
+    "velocityKmS": [-3.561343519356833, -3.479026337639068, 2.145177884538273],
+    "calibration": {
+      "julianDateTdb": 2461957.5,
+      "positionKm": [-991200.1759315536, 716814.8417051994, -270864.1569814017],
+      "source": "NASA/JPL Horizons Titan (606), centre Saturn (699), 2028-07-05 00:00 TDB"
+    }
+  }
+}

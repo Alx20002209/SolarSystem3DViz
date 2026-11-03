@@ -1,9 +1,17 @@
 export const TAU = Math.PI * 2;
+export const AU_KM = 149597870.7;
+
 export function eccentricAnomaly(mean, e) {
-  let E = mean % TAU;
-  for (let i=0;i<10;i++) E -= (E-e*Math.sin(E)-mean%TAU)/(1-e*Math.cos(E));
+  const M = ((mean % TAU) + TAU) % TAU;
+  let E = M;
+  for (let i=0;i<12;i++) {
+    const delta = (E-e*Math.sin(E)-M)/(1-e*Math.cos(E));
+    E -= delta;
+    if (Math.abs(delta)<1e-13) break;
+  }
   return E;
 }
+
 export function positionAt(p, days, phase=0) {
   const E = eccentricAnomaly(days/p.period*TAU+phase,p.e);
   const z=p.orbit*Math.sqrt(1-p.e*p.e)*Math.sin(E);
@@ -22,7 +30,7 @@ const planetaryElements = [
   [30.06992276,.00026291,.00859048,.00005105,1.77004347,.00035372,-55.12002969,218.45945325,44.96476227,-.32241464,131.78422574,-.00508664]
 ];
 
-function planetPositionFromElements(p, index, T, meanAnomaly=null) {
+function planetPositionFromElements(index, T, meanAnomaly=null) {
   const [a0,aRate,e0,eRate,i0,iRate,l0,lRate,peri0,periRate,node0,nodeRate]=planetaryElements[index];
   const a=a0+aRate*T,e=e0+eRate*T,i=(i0+iRate*T)*Math.PI/180;
   const peri=(peri0+periRate*T)*Math.PI/180,node=(node0+nodeRate*T)*Math.PI/180;
@@ -30,18 +38,110 @@ function planetPositionFromElements(p, index, T, meanAnomaly=null) {
   const anomaly=meanAnomaly??(((longitude-peri+Math.PI)%(TAU)+TAU)%(TAU)-Math.PI);
   const E=eccentricAnomaly(anomaly,e),x=a*(Math.cos(E)-e),y=a*Math.sqrt(1-e*e)*Math.sin(E),w=peri-node;
   const cw=Math.cos(w),sw=Math.sin(w),cn=Math.cos(node),sn=Math.sin(node),ci=Math.cos(i),si=Math.sin(i);
-  const scale=p.orbit/a0;
   return [
-    ((cw*cn-sw*sn*ci)*x+(-sw*cn-cw*sn*ci)*y)*scale,
-    (sw*si*x+cw*si*y)*scale,
-    ((cw*sn+sw*cn*ci)*x+(-sw*sn+cw*cn*ci)*y)*scale
+    (cw*cn-sw*sn*ci)*x+(-sw*cn-cw*sn*ci)*y,
+    (cw*sn+sw*cn*ci)*x+(-sw*sn+cw*cn*ci)*y,
+    sw*si*x+cw*si*y
   ];
 }
 
+export function planetHeliocentricAt(index, days) {
+  return planetPositionFromElements(index, days/36525);
+}
+
 export function planetPositionAt(p,index,days) {
-  return planetPositionFromElements(p,index,days/36525);
+  const [x,y,z]=planetHeliocentricAt(index,days);
+  const scale=p.orbit/planetaryElements[index][0];
+  return [x*scale,z*scale,y*scale];
 }
 
 export function planetOrbitAt(p,index,meanAnomaly) {
-  return planetPositionFromElements(p,index,0,meanAnomaly);
+  const [x,y,z]=planetPositionFromElements(index,0,meanAnomaly);
+  const scale=p.orbit/planetaryElements[index][0];
+  return [x*scale,z*scale,y*scale];
+}
+
+function dot(a,b) { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+function cross(a,b) {
+  return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+}
+function magnitude(a) { return Math.sqrt(dot(a,a)); }
+function scaled(a,s) { return [a[0]*s,a[1]*s,a[2]*s]; }
+function add(a,b) { return [a[0]+b[0],a[1]+b[1],a[2]+b[2]]; }
+function positiveAngle(angle) { return (angle%TAU+TAU)%TAU; }
+
+function elementsFromState(state) {
+  const r=state.positionKm,v=state.velocityKmS,mu=state.muKm3S2;
+  const rLength=magnitude(r),h=cross(r,v),hLength=magnitude(h);
+  const n=[-h[1],h[0],0],nLength=magnitude(n);
+  const eccentricityVector=add(scaled(cross(v,h),1/mu),scaled(r,-1/rLength));
+  const e=magnitude(eccentricityVector);
+  const a=1/(2/rLength-dot(v,v)/mu);
+  const inclination=Math.acos(h[2]/hLength);
+  const node=positiveAngle(Math.atan2(n[1],n[0]));
+  const argumentOfPeriapsis=positiveAngle(Math.atan2(
+    dot(cross(n,eccentricityVector),scaled(h,1/hLength))/nLength,
+    dot(n,eccentricityVector)/nLength
+  ));
+  const trueAnomaly=Math.atan2(
+    dot(cross(eccentricityVector,r),scaled(h,1/hLength))/(e*rLength),
+    dot(eccentricityVector,r)/(e*rLength)
+  );
+  const eccentric=2*Math.atan2(
+    Math.sqrt(1-e)*Math.sin(trueAnomaly/2),
+    Math.sqrt(1+e)*Math.cos(trueAnomaly/2)
+  );
+  return {a,e,inclination,node,argumentOfPeriapsis,meanAnomaly:eccentric-e*Math.sin(eccentric)};
+}
+
+function positionFromElements(elements, meanAnomaly) {
+  const {a,e,inclination,node,argumentOfPeriapsis}=elements;
+  const E=eccentricAnomaly(meanAnomaly,e);
+  const x=a*(Math.cos(E)-e),y=a*Math.sqrt(1-e*e)*Math.sin(E);
+  const w=argumentOfPeriapsis,co=Math.cos(node),so=Math.sin(node);
+  const cw=Math.cos(w),sw=Math.sin(w),ci=Math.cos(inclination),si=Math.sin(inclination);
+  return [
+    (cw*co-sw*so*ci)*x+(-sw*co-cw*so*ci)*y,
+    (cw*so+sw*co*ci)*x+(-sw*so+cw*co*ci)*y,
+    sw*si*x+cw*si*y
+  ];
+}
+
+function meanAnomalyFromPosition(elements, position) {
+  const {a,e,inclination,node,argumentOfPeriapsis}=elements;
+  const w=argumentOfPeriapsis,co=Math.cos(node),so=Math.sin(node);
+  const cw=Math.cos(w),sw=Math.sin(w),ci=Math.cos(inclination),si=Math.sin(inclination);
+  const x=(cw*co-sw*so*ci)*position[0]+(cw*so+sw*co*ci)*position[1]+sw*si*position[2];
+  const y=(-sw*co-cw*so*ci)*position[0]+(-sw*so+cw*co*ci)*position[1]+cw*si*position[2];
+  const E=Math.atan2(y/(a*Math.sqrt(1-e*e)),x/a+e);
+  return positiveAngle(E-e*Math.sin(E));
+}
+
+export function createSatelliteOrbit(state, displayRadius) {
+  const elements=elementsFromState(state),scale=displayRadius/elements.a;
+  let meanMotion=TAU/state.periodDays;
+  if(state.calibration){
+    if(!Number.isFinite(state.epochTdbJulianDate)||!Number.isFinite(state.calibration.julianDateTdb))throw new TypeError('Satellite calibration requires an epoch and calibration Julian date');
+    const calibrationDays=state.calibration.julianDateTdb-state.epochTdbJulianDate;
+    const target=meanAnomalyFromPosition(elements,state.calibration.positionKm);
+    const nominal=meanMotion*calibrationDays;
+    const turns=Math.round((elements.meanAnomaly+nominal-target)/TAU);
+    meanMotion=(target+turns*TAU-elements.meanAnomaly)/calibrationDays;
+  }
+  return {
+    elements,
+    periodDays:TAU/meanMotion,
+    meanMotion,
+    positionKmAt(days) {
+      return positionFromElements(elements,elements.meanAnomaly+meanMotion*days);
+    },
+    positionAt(days) {
+      const [x,y,z]=this.positionKmAt(days);
+      return [x*scale,z*scale,y*scale];
+    },
+    orbitAt(meanAnomaly) {
+      const [x,y,z]=positionFromElements(elements,meanAnomaly);
+      return [x*scale,z*scale,y*scale];
+    }
+  };
 }

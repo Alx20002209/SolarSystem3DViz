@@ -34,9 +34,9 @@ The Blender file retains subdivision modifiers, subtle rocky displacement, physi
 
 - `dist/effects.js`: animated solar granulation, corona, prominence loops and luminous stars.
 
-- `dist/orbits.js`: Kepler solver and focus-centered elliptical positions.
+- `dist/orbits.js`: JPL-element planet positions and state-vector Kepler propagation.
 
-- `dist/planets.json`, `dist/moons.json`: modular body and orbit data.
+- `dist/planets.json`, `dist/moons.json`, `dist/satellite-ephemerides.json`: modular body data and epoch state vectors.
 
 - `dist/assets`: separately exported GLB objects.
 
@@ -66,8 +66,29 @@ Moon semimajor axes, periods, eccentricities and inclinations: JPL Planetary Sat
 
 
 
-Planet positions for the selected date use JPL approximate Keplerian elements and rates valid from 1800 through 2050: https://ssd.jpl.nasa.gov/planets/approx_pos.html. These are approximate heliocentric positions, not high-precision Horizons ephemerides; Earth uses the Earth-Moon barycentre elements. NASA Fact Sheet values provide semimajor axes (million km), mean orbital speeds (km/s), sidereal periods (Earth days), and volumetric mean radii (`physicalRadiusKm`). The `radius` and `orbit` fields are compressed display units, not physical sizes or distances. Moon orbital phases and orientations remain illustrative because mean elements do not provide epoch-specific positions. Moon reference planes are simplified to parent equators except Earth and Nereid. Inclination greater than 90 degrees makes Triton retrograde. No N-body dynamics or precession is simulated.
+Planet positions use the JPL approximate Keplerian elements and rates valid from 1800 through 2050: https://ssd.jpl.nasa.gov/planets/approx_pos.html. They are approximate heliocentric positions, not full Horizons integrations. The Earth element is for the Earth-Moon barycentre; the displayed and reported Earth-centre position subtracts the Moon's geocentric vector times the Moon/Earth-Moon mass ratio. Planet vectors are expressed in the ecliptic J2000 frame.
 
+The Moon and Titan start from JPL Horizons geometric state vectors at J2000.0, queried relative to Earth and Saturn respectively, in the ecliptic J2000 frame. Their two-body Kepler orbits use JPL mean periods as a baseline (27.321661 and 15.945448 days). Titan's mean motion is fitted to a second Horizons vector at 2028-07-05 00:00 TDB, using its JPL mean period to resolve the intervening orbit count; the resulting effective period is 15.945392925 days. This improves the requested spot-check phase but does not reproduce N-body perturbations or guarantee the same residual at other dates. The other 20 selected moons use JPL mean periods and eccentricities, but retain simplified starting phases and orbital orientations. All moon distances are compressed for display. See `dist/satellite-ephemerides.json` for the state vectors, periods, gravitational parameters, calibration vector, and source epoch.
+
+The date/time field is interpreted in the browser's local time zone, converted to UTC, then to TDB for the ephemeris calculations. The adjacent `UTC±hh:mm` label reflects the selected date's local offset, including daylight-saving changes. The date slider scrubs continuously; setting a date/time pauses playback. Historical UTC-to-TDB conversion before 1972 uses a ΔT polynomial approximation; dates from 1972 onward use the leap-second table and the standard TDB−TT periodic correction.
+
+For an arbitrary instant, open the browser developer console after the scene loads and run `window.solarSystem.ephemerisAt(new Date('2028-07-04T23:58:50.816Z'))`. The returned planet coordinates are heliocentric AU in ecliptic J2000; `titanRelativeToSaturnKm` is the Saturn-centred Titan vector in km. Compare with geometric Horizons vectors using center `500@10` for planets and `500@699` for Titan, `REF_PLANE='ECLIPTIC'`, `REF_SYSTEM='J2000'`, and matching TDB time. The date, frame, time scale, and origin must match for a meaningful comparison.
+
+### JPL spot check — 2028-07-05 00:00 TDB
+
+Horizons geometric vectors use JDTDB 2461957.5, ecliptic J2000.0, with the Sun as centre for Earth/Saturn and Saturn as centre for Titan. The app values below use the same frame and epoch; planet values are from JPL's approximate element model, and Titan uses its calibrated two-body orbit.
+
+| Body | App position | JPL Horizons position | Position error |
+|---|---|---|---:|
+| Earth (AU) | (0.230727399, -0.990145468, 0.000061871) | (0.230650792, -0.990168575, 0.000065023) | 11,980 km |
+| Saturn (AU) | (7.728394277, 5.075057942, -0.395749461) | (7.730807011, 5.063047269, -0.395903430) | 1,832,811 km |
+| Titan relative to Saturn (km) | (-993,847, 717,873, -273,054) | (-991,200, 716,815, -270,864) | 3,595 km |
+
+These are position-vector differences, not visual-scale distances. The Earth and Saturn residuals are expected limitations of the JPL approximate planetary elements; use Horizons directly when high-precision planetary positions are required. The Titan calibration improves the specified reference epoch, but dates away from that anchor still use a two-body approximation.
+
+The `radius` and `orbit` fields in `planets.json` and `moons.json` are compressed display units, not physical radii or distances. NASA Fact Sheet values provide semimajor axes (million km), mean orbital speeds (km/s), sidereal periods (Earth days), and volumetric mean radii (`physicalRadiusKm`). No N-body dynamics or precession is simulated. The information panel shows NASA sidereal rotation periods.
+
+The mobile renderer uses a higher pixel-ratio cap (2×) and disables multisample rendering on phones/coarse-pointer devices to keep text and planets sharp while reducing GPU cost. During object follow, click “Unlock camera” or right-drag to release the target and pan; touch devices can use the visible unlock button before panning.
 
 
 The date controls select a UTC calendar day and initially open at the current date. The speed control advances the shared simulation clock at 0.25 Earth days per second by default; selecting a date pauses motion. Planet and moon orbits advance by the same simulated Earth-day interval, though moon phases at any date remain illustrative. Planet spin rates follow NASA sidereal periods and stop when simulation time is paused. Starting prime-meridian phases and exact pole orientations are simplified. Playback stops at the end of the JPL element range in 2050. Moon surfaces keep an illustrative three-minute spin independent of orbital phase. The information panel shows NASA sidereal rotation periods.
