@@ -2,7 +2,7 @@ import {loadEphemeris} from './ephemeris.js';
 import {calendarDisplayPosition} from './calendar.js';
 import {renderResolution} from './render-resolution.js';
 import {planetRotationAt,earthCloudRotationAt,simulationDelta} from './rotation.js';
-import {scaleBody,scaleEnvironment,systemExtent,SUN_RADIUS,illustrativeBody} from './scale.js?v=outer-spacing-1';
+import {scaleBody,scaleEnvironment,systemExtent,SUN_RADIUS,illustrativeBody} from './scale.js?v=spacing-table-2';
 import {createAtmospherePanel} from './atmosphere.js';
 import * as THREE from 'three';
 import {createMenu} from './menu.js';
@@ -77,7 +77,7 @@ try{
  }));
 }catch(error){$('loading').textContent='A planet or moon could not load. Reload to try again.';throw error}
 const environment=createEnvironment(scene,bodies,moons,environmentData,realisticScale);
-const asteroidData=(await data('./named-asteroids.json')).map(a=>realisticScale?scaleBody(a):{...a,period:1800,e:0,inclination:0});
+const asteroidData=(await data('./named-asteroids.json')).map(a=>realisticScale?scaleBody(a):{...illustrativeBody(a),period:1800,e:0,inclination:0});
 const asteroids=createAsteroids(scene,asteroidData,label,pickMeshes,selectAsteroid);
 const calendarBodies=new Map([...planets,...asteroidData,...moons.map(m=>({...m,orbit:m.orbitData.orbit}))].map(b=>[b.name,b]));
 const datedPosition=(name,at=days)=>calendarDisplayPosition(calendar,name,at,calendarBodies,realisticScale);
@@ -139,7 +139,7 @@ for(const [i,p] of [[-1,{name:'Sun',color:'#ff9b35'}],...planets.map((p,i)=>[i,p
 const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();let down;
 renderer.domElement.addEventListener('pointercancel',()=>{down=null});
 renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY]});renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5){down=null;return}down=null;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);const visible=interactableObjects.filter(o=>{let p=o;while(p){if(!p.visible)return false;p=p.parent}return true});raycaster.intersectObjects(visible,false)[0]?.object.userData.onClick?.()});
-function overview(top=false,inner=false){cancelFlight();following=false;systemView=false;controls.minDistance=.000001;const extent=realisticScale?(inner?240:3700):94;camera.position.set(top?0:extent*1.6,top?extent*3.2:extent*2,top?.01:extent*2.2);if(innerWidth<650)camera.position.multiplyScalar(1.3);controls.target.set(0,0,0);controls.update();showDetails()}
+function overview(top=false,inner=false){cancelFlight();following=false;systemView=false;controls.minDistance=.000001;const extent=realisticScale?(inner?240:3700):105;camera.position.set(top?0:extent*1.6,top?extent*3.2:extent*2,top?.01:extent*2.2);if(innerWidth<650)camera.position.multiplyScalar(1.3);controls.target.set(0,0,0);controls.update();showDetails()}
 $('scale-mode').textContent=realisticScale?'Realistic Scale ✓':'Realistic Scale';$('scale-mode').setAttribute('aria-pressed',String(realisticScale));$('scale-mode').title=realisticScale?'Return to the previous illustrative scale':'Use true relative distances and sizes';
 $('scale-mode').onclick=()=>{const url=new URL(location.href);if(realisticScale)url.searchParams.delete('scale');else url.searchParams.set('scale','realistic');url.searchParams.set('day',String(days));url.searchParams.set('paused',String(paused));if(referenceMode){url.searchParams.set('date',utcDate().toISOString().slice(0,10));url.searchParams.set('at',utcDate().toISOString().slice(11,19))}location.assign(url.href)};
 $('inner').hidden=!realisticScale;$('home').textContent=realisticScale?'↺ All planets':'↺ Overview';
@@ -156,6 +156,7 @@ $('environment-info').onclick=()=>$('environment-dialog').showModal();$('close-e
 for(const item of environmentSources){if(!realisticScale)item.note+=' In Illustrative Scale, this region is compressed to the previous display layout.';const section=document.createElement('section');section.className='source-item';const heading=document.createElement('h3');heading.textContent=item.title;const placement=document.createElement('strong');placement.textContent=item.placement;const note=document.createElement('p');note.textContent=item.note;const link=document.createElement('a');link.href=item.url;link.target='_blank';link.rel='noopener';link.textContent='Read the scientific source ↗';section.append(heading,placement,note,link);$('environment-sources').append(section)}
 $('about').onclick=()=>$('model-info').showModal();$('close-about').onclick=()=>$('model-info').close();
 
+const distanceTableButton=document.createElement('button');distanceTableButton.textContent='Distances & scale';distanceTableButton.onclick=()=>{const u=new URL('./distances.html',location.href);u.searchParams.set('date',referenceMode?utcDate().toISOString().slice(0,10):'2000-01-01');u.searchParams.set('at',referenceMode?utcDate().toISOString().slice(11,19):'12:00:00');if(realisticScale)u.searchParams.set('scale','realistic');window.open(u.href,'_blank','noopener')};document.querySelector('.scene-actions').append(distanceTableButton);
 const calendarButton=document.createElement('button');calendarButton.textContent=referenceMode?'Calendar 2000 ✓':'Solar calendar';calendarButton.onclick=()=>{const u=new URL(location.href);u.search='?calendar=2000&date=2000-01-01';location.assign(u.href)};document.querySelector('.scene-actions').prepend(calendarButton);
 if(referenceMode){
  const chooser=document.createElement('select');chooser.id='calendar-object';chooser.setAttribute('aria-label','Select any of the 35 bodies');

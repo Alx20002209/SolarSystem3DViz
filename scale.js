@@ -29,5 +29,5 @@ export function scaleEnvironment(data){
 // room for enlarged outer planets and Saturn's rings. Never used in true scale.
 const DISPLAY_ORBITS={Jupiter:30,Saturn:52,Uranus:70,Neptune:88};
 export function illustrativeBody(body){
- return {...body,assetRadius:body.radius,orbit:DISPLAY_ORBITS[body.name]??body.orbit};
+ return {...body,assetRadius:body.radius,orbit:body.parent?body.orbit:(DISPLAY_ORBITS[body.name]??body.orbit)*1.12};
 }
