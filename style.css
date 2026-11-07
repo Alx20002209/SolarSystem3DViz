@@ -72,3 +72,5 @@ header #environment-info{margin-left:auto}header #about{margin-left:0}.scene-act
 .playback-control [hidden]{display:none!important}button:disabled{opacity:.55;cursor:default}
 
 #calendar-object{background:#080808;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px;min-height:44px;max-width:200px;flex-shrink:0;font:inherit}
+
+body:has(#calendar-object) .playback-control{display:block;flex:1;width:auto}body:has(#calendar-object) .playback-control .time-label{min-width:0;width:auto}body:has(#calendar-object) .time-label span{display:inline-block;margin-right:10px}body:has(#calendar-object) .time-label strong{white-space:nowrap}
