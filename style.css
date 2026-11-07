@@ -73,4 +73,10 @@ header #environment-info{margin-left:auto}header #about{margin-left:0}.scene-act
 
 #calendar-object{background:#080808;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px;min-height:44px;max-width:200px;flex-shrink:0;font:inherit}
 
-body:has(#calendar-object) .playback-control{display:block;flex:1;width:auto}body:has(#calendar-object) .playback-control .time-label{min-width:0;width:auto}body:has(#calendar-object) .time-label span{display:inline-block;margin-right:10px}body:has(#calendar-object) .time-label strong{white-space:nowrap}
+
+
+#calendar-time{width:108px;min-height:36px;background:#080808;color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:4px;font:inherit}
+body.continuous-calendar .playback-control{display:flex;width:auto;gap:8px}body.continuous-calendar .time-label{min-width:110px}body.continuous-calendar .time-label span{display:block;margin:0 0 4px}body.continuous-calendar .date-control{flex-basis:440px;max-width:48vw}
+@media(max-width:650px){body.continuous-calendar .playback-control{display:grid;grid-template-columns:44px minmax(76px,1fr) 54px 74px;width:100%;gap:4px}body.continuous-calendar .playback-control .time-label{min-width:0}body.continuous-calendar .date-control{max-width:none;flex-basis:auto;flex-wrap:wrap}body.continuous-calendar #calendar-time{height:44px;font-size:16px}body.continuous-calendar #date{min-width:40px}}
+
+.accuracy-link{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:11px;color:var(--mint);background:#080808d9;white-space:nowrap;min-height:44px;flex-shrink:0}
