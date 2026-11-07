@@ -2,7 +2,7 @@ import {loadEphemeris} from './ephemeris.js';
 import {calendarDisplayPosition} from './calendar.js';
 import {renderResolution} from './render-resolution.js';
 import {planetRotationAt,earthCloudRotationAt,simulationDelta} from './rotation.js';
-import {scaleBody,scaleEnvironment,systemExtent,SUN_RADIUS,illustrativeBody} from './scale.js';
+import {scaleBody,scaleEnvironment,systemExtent,SUN_RADIUS,illustrativeBody} from './scale.js?v=outer-spacing-1';
 import {createAtmospherePanel} from './atmosphere.js';
 import * as THREE from 'three';
 import {createMenu} from './menu.js';
