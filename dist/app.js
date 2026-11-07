@@ -1,3 +1,4 @@
+import {createCalendar} from './calendar.js';
 import {renderResolution} from './render-resolution.js';
 import {planetRotationAt,earthCloudRotationAt,simulationDelta} from './rotation.js';
 import {scaleBody,scaleEnvironment,systemExtent,SUN_RADIUS} from './scale.js';
@@ -17,7 +18,7 @@ import {createAsteroids} from './asteroids.js';
 import {createEnvironment} from './environment.js';
 import {createSun,createStars} from './effects.js';
 const $=id=>document.getElementById(id);
-const viewParams=new URLSearchParams(location.search),realisticScale=viewParams.get('scale')==='realistic';
+const viewParams=new URLSearchParams(location.search),referenceMode=viewParams.get('calendar')==='2000',realisticScale=referenceMode||viewParams.get('scale')==='realistic';
 const displayBody=b=>realisticScale?scaleBody(b):{...b,assetRadius:b.radius};
 const sunRadius=realisticScale?SUN_RADIUS:3;
 const modelInfo=$('model-info'),modelParagraphs=modelInfo.querySelectorAll('p');
@@ -31,9 +32,10 @@ const menu=createMenu();
 createAtmospherePanel(()=>$('planet-name').textContent);
 async function data(file){const r=await fetch(file);if(!r.ok)throw Error(file+' could not load');return r.json()}
 const [rawPlanets,rawMoons,rawEnvironment,environmentSources]=await Promise.all([data('./planets.json'),data('./moons.json'),data('./environment-data.json'),data('./environment-sources.json')]);
+const calendar=referenceMode?createCalendar(await data('./calendar-2000.json')):null;
 const planets=rawPlanets.map(displayBody),moonData=rawMoons.map(displayBody),environmentData=realisticScale?scaleEnvironment(rawEnvironment):rawEnvironment;
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x000000);
-const camera=new THREE.PerspectiveCamera(43,innerWidth/innerHeight,.05,2000);
+const camera=new THREE.PerspectiveCamera(43,innerWidth/innerHeight,.05,realisticScale?100000:2000);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(renderResolution(innerWidth,innerHeight,devicePixelRatio,matchMedia('(pointer:coarse)').matches).pixelRatio);renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 $('universe').append(renderer.domElement);
 const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=.5;controls.maxDistance=24000;controls.maxPolarAngle=Math.PI*.98;
@@ -42,17 +44,18 @@ scene.add(new THREE.AmbientLight(0xffffff,.16));const light=new THREE.PointLight
 const solar=createSun(scene);solar.group.scale.setScalar(sunRadius/3);const stars=createStars(scene);stars.scale.setScalar(realisticScale?30:1);
 const renderTarget=new THREE.WebGLRenderTarget(innerWidth,innerHeight,{type:THREE.HalfFloatType,samples:4});const composer=new EffectComposer(renderer,renderTarget);composer.addPass(new RenderPass(scene,camera));const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.25,.15,1.15);composer.addPass(bloom);composer.addPass(new OutputPass());
 const orbitGroup=new THREE.Group();scene.add(orbitGroup);const bodies=[],moons=[];
-const DAY_MS=86400000,J2000_MS=Date.UTC(2000,0,1,12),MIN_DATE_DAYS=Math.round((Date.UTC(1800,0,1,12)-J2000_MS)/DAY_MS),MAX_DATE_DAYS=Math.round((Date.UTC(2050,11,31,12)-J2000_MS)/DAY_MS);
+const DAY_MS=86400000,J2000_MS=Date.UTC(2000,0,1,12),MIN_DATE_DAYS=referenceMode?0:Math.round((Date.UTC(1800,0,1,12)-J2000_MS)/DAY_MS),MAX_DATE_DAYS=referenceMode?365:Math.round((Date.UTC(2050,11,31,12)-J2000_MS)/DAY_MS);
 let selected=2,selectedMoon=null,selectedAsteroid=null,following=false,systemView=false,paused=false,days=Math.max(MIN_DATE_DAYS,Math.min(MAX_DATE_DAYS,(Date.now()-J2000_MS)/DAY_MS)),spinSeconds=0,effectTime=0,names=true,moonsVisible=true;
 const dateSlider=$('date'),datePicker=$('date-picker');
 dateSlider.min=String(MIN_DATE_DAYS);dateSlider.max=String(MAX_DATE_DAYS);dateSlider.value=String(Math.round(days));days=Number(dateSlider.value);
 let displayedDateDay=NaN;
 function updateDateControls(){const day=Math.round(days);if(day===displayedDateDay)return;displayedDateDay=day;const value=String(day);if(dateSlider.value!==value)dateSlider.value=value;datePicker.value=new Date(J2000_MS+day*DAY_MS).toISOString().slice(0,10);$('date-prev-month').disabled=day<=MIN_DATE_DAYS;$('date-next-month').disabled=day>=MAX_DATE_DAYS}
-function selectDate(day){days=Math.max(MIN_DATE_DAYS,Math.min(MAX_DATE_DAYS,Math.round(day)));paused=true;$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement');updateDateControls()}
+function selectDate(day){days=Math.max(MIN_DATE_DAYS,Math.min(MAX_DATE_DAYS,Math.round(day)));paused=true;$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement');updateDateControls();if(referenceMode){const url=new URL(location.href);url.searchParams.set('date',datePicker.value);history.replaceState(null,'',url);showDetails()}}
 function shiftDateByMonth(offset){const current=new Date(J2000_MS+Math.round(days)*DAY_MS),day=current.getUTCDate(),target=new Date(Date.UTC(current.getUTCFullYear(),current.getUTCMonth()+offset,1,12)),lastDay=new Date(Date.UTC(target.getUTCFullYear(),target.getUTCMonth()+1,0,12)).getUTCDate();target.setUTCDate(Math.min(day,lastDay));selectDate((target.getTime()-J2000_MS)/DAY_MS)}
 function dateInputToDay(value){const [year,month,day]=value.split('-').map(Number);return (Date.UTC(year,month-1,day,12)-J2000_MS)/DAY_MS}
 if(viewParams.has('day')&&Number.isFinite(Number(viewParams.get('day'))))days=Math.max(MIN_DATE_DAYS,Math.min(MAX_DATE_DAYS,Number(viewParams.get('day'))));
-paused=viewParams.get('paused')==='true';if(paused){$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement')}
+if(referenceMode){const date=viewParams.get('date')||'2000-01-01';const value=dateInputToDay(date);days=Number.isFinite(value)?Math.max(0,Math.min(365,value)):0;datePicker.min='2000-01-01';datePicker.max='2000-12-31';}
+paused=referenceMode||viewParams.get('paused')==='true';if(paused){$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement')}
 updateDateControls();
 let cameraFlight=null;
 const loader=new GLTFLoader();
@@ -89,7 +92,9 @@ function showDetails(){
  else if(selectedMoon){const m=selectedMoon;title=m.name;$('category').textContent=`MOON OF ${m.parent.toUpperCase()}`;$('description').textContent=`${m.name} orbits ${m.parent}. ${m.surfaceNote}`;infoFields(['MEAN DISTANCE FROM PLANET','ORBITAL ECCENTRICITY','ONE ORBIT','ORBIT DIRECTION'],[`${m.distance.toLocaleString()} <small>km</small>`,m.e.toFixed(3),`${m.period.toFixed(3)} <small>Earth days</small>`,m.inclination>90?'Retrograde':'Prograde']);}
  else if(selected===-1){title='Sun';$('category').textContent='OUR CENTRAL STAR';$('description').textContent='A turbulent sphere of glowing plasma. Granulation, a luminous corona and looping prominences bring its surface to life.';infoFields(['STAR TYPE','ENERGY SOURCE','PLANETARY SYSTEM','MOONS IN THIS MODEL'],['G-type star','Nuclear fusion','8 <small>planets</small>','22 <small>selected moons</small>']);}
  else{title=p.name;$('category').textContent=`0${selected+1} / ${selected<4?'TERRESTRIAL WORLD':selected<6?'GAS GIANT':'ICE GIANT'}`;$('description').textContent=p.description;infoFields(['ORBIT SEMIMAJOR AXIS','MEAN ORBITAL SPEED','SIDEREAL ORBIT PERIOD','SIDEREAL ROTATION'],[`${p.distance.toLocaleString()} <small>million km</small>`,`${p.speed.toFixed(2)} <small>km / s</small>`,`${p.period.toLocaleString()} <small>Earth days</small>`,`${Math.abs(p.rotation).toLocaleString()} <small>h${p.rotation<0?' · retrograde':''}</small>`]);}
+ if(referenceMode){const parent=selectedMoon?.parent||'Sun';infoFields(['DISTANCE FROM SUN · THIS DATE',selectedMoon?`DISTANCE FROM ${parent.toUpperCase()} · THIS DATE`:'DISTANCE FROM SUN (AU)','SPEED RELATIVE TO SUN','POSITION TIME (UTC)'],[`${calendar.distance(title,days).toLocaleString(undefined,{maximumFractionDigits:0})} <small>km</small>`,selectedMoon?`${calendar.distance(title,days,parent).toLocaleString(undefined,{maximumFractionDigits:0})} <small>km</small>`:`${(calendar.distance(title,days)/149597870.7).toFixed(6)} <small>AU</small>`,`${calendar.speed(title,days).toFixed(3)} <small>km/s</small>`,`${new Date(J2000_MS+Math.round(days)*DAY_MS).toISOString().slice(0,10)} <small>12:00</small>`]);}
  const source=$('surface-source');source.hidden=!selectedMoon&&!selectedAsteroid;if(selectedAsteroid){source.href=selectedAsteroid.source;source.textContent='Object facts & source'}else if(selectedMoon){source.href=selectedMoon.surfaceSource;source.textContent='Surface imagery & provenance ↗'}
+ if(referenceMode){source.hidden=false;source.href=calendar.source(title,days);source.textContent='Verify this body in NASA/JPL Horizons ↗';}
  $('planet-name').textContent=title;$('focus').innerHTML=`${following?'Following':'Follow'} ${title} <span>↗</span>`;
  document.querySelectorAll('#planet-nav button').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.index)===selected));bodies.forEach((b,i)=>b.label.classList.toggle('selected',i===selected));
  $('system-view').hidden=selected<0||!moons.some(m=>m.parentIndex===selected);
@@ -142,6 +147,24 @@ $('dust-gas').onclick=()=>{environment.setDust(!environment.dustOn);$('dust-gas'
 $('environment-info').onclick=()=>$('environment-dialog').showModal();$('close-environment').onclick=()=>$('environment-dialog').close();
 for(const item of environmentSources){if(!realisticScale)item.note+=' In Illustrative Scale, this region is compressed to the previous display layout.';const section=document.createElement('section');section.className='source-item';const heading=document.createElement('h3');heading.textContent=item.title;const placement=document.createElement('strong');placement.textContent=item.placement;const note=document.createElement('p');note.textContent=item.note;const link=document.createElement('a');link.href=item.url;link.target='_blank';link.rel='noopener';link.textContent='Read the scientific source ↗';section.append(heading,placement,note,link);$('environment-sources').append(section)}
 $('about').onclick=()=>$('model-info').showModal();$('close-about').onclick=()=>$('model-info').close();
+
+const calendarButton=document.createElement('button');calendarButton.textContent=referenceMode?'Calendar 2000 ✓':'Solar calendar';calendarButton.onclick=()=>{const u=new URL(location.href);u.search='?calendar=2000&date=2000-01-01';location.assign(u.href)};document.querySelector('.scene-actions').prepend(calendarButton);
+if(referenceMode){
+ const chooser=document.createElement('select');chooser.id='calendar-object';chooser.setAttribute('aria-label','Select any of the 35 bodies');
+ const choices=[{name:'Sun',choose:()=>selectPlanet(-1)},...planets.map((p,i)=>({name:p.name,choose:()=>selectPlanet(i)})),...moons.map(m=>({name:m.name,choose:()=>selectMoon(m)})),...asteroids.items.map(a=>({name:a.name,choose:()=>selectAsteroid(a)}))];
+ chooser.add(new Option('Explore all 35 bodies…',''));choices.forEach((c,i)=>chooser.add(new Option(c.name,String(i))));chooser.onchange=()=>{if(chooser.value!=='')choices[Number(chooser.value)].choose()};document.querySelector('.scene-actions').prepend(chooser);
+ document.querySelector('.intro p').textContent='35 bodies · Daily NASA/JPL positions · 12:00 UTC';
+ document.querySelector('.mini-note').textContent='JPL daily positions · 2000 · 12:00 UTC. True distance and nominal size scale. Surface rotation and lighting remain illustrative.';
+ document.querySelector('.time-label span').textContent='JPL SOLAR CALENDAR';$('time-output').textContent='2000 · daily · 12:00 UTC';
+ ['play','time','slow-time','real-time'].forEach(id=>$(id).hidden=true);
+ $('date').setAttribute('aria-label','Select a day in the verified 2000 calendar');$('date').title='Daily JPL snapshots throughout 2000, at 12:00 UTC';
+ orbitGroup.visible=false;$('paths').setAttribute('aria-pressed','false');$('paths').textContent='Snapshot · no orbit trails';$('paths').disabled=true;
+ environment.setBelts(false);environment.setDust(false);['belts','dust-gas'].forEach(id=>{$(id).disabled=true;$(id).setAttribute('aria-pressed','false')});$('belts').textContent='Belt particles hidden';$('dust-gas').textContent='Illustrative gas hidden';
+ $('scale-mode').disabled=true;$('scale-mode').textContent='True distance scale ✓';
+ const exit=document.createElement('button');exit.textContent='Exit calendar';exit.onclick=()=>{const u=new URL(location.href);u.search='?scale=realistic';location.assign(u.href)};document.querySelector('.scene-actions').append(exit);
+ modelParagraphs[2].textContent='Calendar mode uses NASA/JPL Horizons geometric vectors for all 35 selectable bodies, sampled daily at 12:00 UTC throughout 2000. All positions are heliocentric in the J2000 ecliptic frame. Distances and nominal radii share 100 units per AU. Dates between samples are not animated. Body orientation, lighting and surface effects remain illustrative.';
+}
+
 const phonePointer=matchMedia('(pointer:coarse)');
 let lastRenderSize='';
 function resizeScene(){
@@ -163,8 +186,9 @@ scene.updateMatrixWorld(true);overview();$('loading').remove();const clock=new T
 document.addEventListener('visibilitychange',()=>clock.start());
 function placeLabel(el,position,offset,visible=true){v.copy(position);v.y+=offset;v.project(camera);el.style.display=names&&visible&&v.z<1&&v.z>-1?'block':'none';el.style.transform=`translate(${(v.x*.5+.5)*innerWidth}px,${(-v.y*.5+.5)*innerHeight}px) translate(-50%,-100%)`}
 function animate(){requestAnimationFrame(animate);const elapsed=clock.getDelta(),frameDt=elapsed,dt=menu.isOpen||document.hidden?0:frameDt,rate=Number($('time').value);beltUpdateElapsed+=menu.isOpen?0:Math.min(elapsed,.5);const refreshBelts=beltUpdateElapsed>=beltUpdateInterval;if(refreshBelts)beltUpdateElapsed%=beltUpdateInterval;if(!paused){days=Math.min(MAX_DATE_DAYS,days+simulationDelta(dt,rate,false));if(days>=MAX_DATE_DAYS){paused=true;$('play').textContent='▶';$('play').setAttribute('aria-label','Resume orbital movement')}}spinSeconds+=dt;effectTime+=dt*.35;old.copy(selectedPosition());
- bodies.forEach((b,i)=>{b.root.position.fromArray(planetPositionAt(planets[i],i,days));b.model.rotation.y=planetRotationAt(planets[i],days);if(b.model.userData.clouds)b.model.userData.clouds.rotation.y=earthCloudRotationAt(planets[i],days)});
- moons.forEach(m=>{m.node.position.fromArray(positionAt(m.orbitData,days,m.phase));m.model.rotation.y=TAU*spinSeconds/180;m.plane.visible=moonsVisible;m.line.visible=orbitGroup.visible&&m.parentIndex===selected&&following});environment.belts.visible=environment.beltsOn&&!(following&&selectedAsteroid);asteroids.update(days,spinSeconds);solar.update(effectTime);scene.updateMatrixWorld(true);
+ bodies.forEach((b,i)=>{b.root.position.fromArray(referenceMode?calendar.position(planets[i].name,days):planetPositionAt(planets[i],i,days));b.model.rotation.y=planetRotationAt(planets[i],days);if(b.model.userData.clouds)b.model.userData.clouds.rotation.y=earthCloudRotationAt(planets[i],days)});
+ if(referenceMode)scene.updateMatrixWorld(true);
+ moons.forEach(m=>{if(referenceMode)m.node.position.copy(m.plane.worldToLocal(new THREE.Vector3(...calendar.position(m.name,days))));else m.node.position.fromArray(positionAt(m.orbitData,days,m.phase));m.model.rotation.y=TAU*spinSeconds/180;m.plane.visible=moonsVisible;m.line.visible=orbitGroup.visible&&m.parentIndex===selected&&following});environment.belts.visible=environment.beltsOn&&!(following&&selectedAsteroid);asteroids.update(days,spinSeconds);if(referenceMode)asteroids.items.forEach(a=>a.root.position.fromArray(calendar.position(a.name,days)));solar.update(effectTime);scene.updateMatrixWorld(true);
  for(const b of beltObstacles){b.node.getWorldPosition(obstaclePosition);b.x=obstaclePosition.x;b.y=obstaclePosition.y;b.z=obstaclePosition.z;}
  environment.update(days,spinSeconds,beltObstacles,refreshBelts);
  if(cameraFlight){

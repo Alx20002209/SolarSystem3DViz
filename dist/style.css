@@ -68,3 +68,7 @@ header #environment-info{margin-left:auto}header #about{margin-left:0}.scene-act
  .playback-control{width:52%;flex:1}.date-control{width:44%;flex:1}
  #detail{left:auto;right:10px;width:280px;max-height:calc(100dvh - var(--dock-height) - var(--action-height) - 72px)}
 }
+
+.playback-control [hidden]{display:none!important}button:disabled{opacity:.55;cursor:default}
+
+#calendar-object{background:#080808;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px;min-height:44px;max-width:200px;flex-shrink:0;font:inherit}
