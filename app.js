@@ -2,7 +2,7 @@ import {loadEphemeris} from './ephemeris.js';
 import {calendarDisplayPosition} from './calendar.js';
 import {renderResolution} from './render-resolution.js';
 import {planetRotationAt,earthCloudRotationAt,simulationDelta} from './rotation.js';
-import {scaleBody,scaleEnvironment,systemExtent,SUN_RADIUS} from './scale.js';
+import {scaleBody,scaleEnvironment,systemExtent,SUN_RADIUS,illustrativeBody} from './scale.js';
 import {createAtmospherePanel} from './atmosphere.js';
 import * as THREE from 'three';
 import {createMenu} from './menu.js';
@@ -20,7 +20,7 @@ import {createEnvironment} from './environment.js';
 import {createSun,createStars} from './effects.js';
 const $=id=>document.getElementById(id);
 const viewParams=new URLSearchParams(location.search),referenceMode=viewParams.get('calendar')==='2000',realisticScale=viewParams.get('scale')==='realistic';
-const displayBody=b=>realisticScale?scaleBody(b):{...b,assetRadius:b.radius};
+const displayBody=b=>realisticScale?scaleBody(b):illustrativeBody(b);
 const sunRadius=realisticScale?SUN_RADIUS:3;
 const modelInfo=$('model-info'),modelParagraphs=modelInfo.querySelectorAll('p');
 modelParagraphs[1].textContent='Sun, planet and moon sizes and orbital distances share a single linear scale. Labels are clickable screen markers, not enlarged bodies. Use Inner system, All planets, or Moon system to navigate.';
@@ -139,7 +139,7 @@ for(const [i,p] of [[-1,{name:'Sun',color:'#ff9b35'}],...planets.map((p,i)=>[i,p
 const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();let down;
 renderer.domElement.addEventListener('pointercancel',()=>{down=null});
 renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY]});renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5){down=null;return}down=null;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);const visible=interactableObjects.filter(o=>{let p=o;while(p){if(!p.visible)return false;p=p.parent}return true});raycaster.intersectObjects(visible,false)[0]?.object.userData.onClick?.()});
-function overview(top=false,inner=false){cancelFlight();following=false;systemView=false;controls.minDistance=.000001;const extent=realisticScale?(inner?240:3700):64;camera.position.set(top?0:extent*1.6,top?extent*3.2:extent*2,top?.01:extent*2.2);if(innerWidth<650)camera.position.multiplyScalar(1.3);controls.target.set(0,0,0);controls.update();showDetails()}
+function overview(top=false,inner=false){cancelFlight();following=false;systemView=false;controls.minDistance=.000001;const extent=realisticScale?(inner?240:3700):94;camera.position.set(top?0:extent*1.6,top?extent*3.2:extent*2,top?.01:extent*2.2);if(innerWidth<650)camera.position.multiplyScalar(1.3);controls.target.set(0,0,0);controls.update();showDetails()}
 $('scale-mode').textContent=realisticScale?'Realistic Scale ✓':'Realistic Scale';$('scale-mode').setAttribute('aria-pressed',String(realisticScale));$('scale-mode').title=realisticScale?'Return to the previous illustrative scale':'Use true relative distances and sizes';
 $('scale-mode').onclick=()=>{const url=new URL(location.href);if(realisticScale)url.searchParams.delete('scale');else url.searchParams.set('scale','realistic');url.searchParams.set('day',String(days));url.searchParams.set('paused',String(paused));if(referenceMode){url.searchParams.set('date',utcDate().toISOString().slice(0,10));url.searchParams.set('at',utcDate().toISOString().slice(11,19))}location.assign(url.href)};
 $('inner').hidden=!realisticScale;$('home').textContent=realisticScale?'↺ All planets':'↺ Overview';

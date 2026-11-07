@@ -24,3 +24,10 @@ export function scaleEnvironment(data){
   })};
  })};
 }
+
+// Display-only spacing: retain dated directions and radial variation, but leave
+// room for enlarged outer planets and Saturn's rings. Never used in true scale.
+const DISPLAY_ORBITS={Jupiter:30,Saturn:52,Uranus:70,Neptune:88};
+export function illustrativeBody(body){
+ return {...body,assetRadius:body.radius,orbit:DISPLAY_ORBITS[body.name]??body.orbit};
+}
