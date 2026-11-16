@@ -1,0 +1,219 @@
+{
+  "utc": "2000-12-31T23:59:59Z",
+  "source": "Independent NASA/JPL Horizons heliocentric queries",
+  "maxErrorKm": 0.17951581597815364,
+  "maxDirectionErrorDegrees": 7.170766232596594e-8,
+  "maxSceneErrorUnits": 4.569106098585471e-13,
+  "rows": [
+    {
+      "name": "Sun",
+      "errorKm": 0,
+      "longitudeDegrees": 0,
+      "latitudeDegrees": 0
+    },
+    {
+      "name": "Mercury",
+      "errorKm": 0.0002228269846265732,
+      "longitudeDegrees": 292.3885008483423,
+      "latitudeDegrees": -6.30512054767969
+    },
+    {
+      "name": "Venus",
+      "errorKm": 0.00019000148130186165,
+      "longitudeDegrees": 46.8349331587728,
+      "latitudeDegrees": -1.6907394439947638
+    },
+    {
+      "name": "Earth",
+      "errorKm": 0.00016424331133834812,
+      "longitudeDegrees": 100.62968427856345,
+      "latitudeDegrees": 0.00001766111790405349
+    },
+    {
+      "name": "Mars",
+      "errorKm": 0.00012049229595017609,
+      "longitudeDegrees": 182.00018677073635,
+      "latitudeDegrees": 1.3652515531065543
+    },
+    {
+      "name": "Jupiter",
+      "errorKm": 0.00007302473072173588,
+      "longitudeDegrees": 69.13929496540368,
+      "latitudeDegrees": -0.6790186122460746
+    },
+    {
+      "name": "Saturn",
+      "errorKm": 0.00005501081327070845,
+      "longitudeDegrees": 59.037466746321,
+      "latitudeDegrees": -2.0262816622165993
+    },
+    {
+      "name": "Uranus",
+      "errorKm": 0.17948927333225503,
+      "longitudeDegrees": 320.3853539878614,
+      "latitudeDegrees": -0.7079037400372156
+    },
+    {
+      "name": "Neptune",
+      "errorKm": 0.17949129003948905,
+      "longitudeDegrees": 306.1058274970442,
+      "latitudeDegrees": 0.17526863536262258
+    },
+    {
+      "name": "Moon",
+      "errorKm": 0.0001625460586566024,
+      "longitudeDegrees": 100.48525045437668,
+      "latitudeDegrees": -0.012877963943263215
+    },
+    {
+      "name": "Phobos",
+      "errorKm": 0.00011785233516115863,
+      "longitudeDegrees": 182.0021948035675,
+      "latitudeDegrees": 1.3647567093013424
+    },
+    {
+      "name": "Deimos",
+      "errorKm": 0.00012466186021711724,
+      "longitudeDegrees": 181.99581667485472,
+      "latitudeDegrees": 1.3669497613136605
+    },
+    {
+      "name": "Io",
+      "errorKm": 0.000028225741615719036,
+      "longitudeDegrees": 69.14766849998341,
+      "latitudeDegrees": -0.6805736413587319
+    },
+    {
+      "name": "Europa",
+      "errorKm": 0.0000757965108270604,
+      "longitudeDegrees": 69.18563029769359,
+      "latitudeDegrees": -0.6800428125646044
+    },
+    {
+      "name": "Ganymede",
+      "errorKm": 0.000014859249080443223,
+      "longitudeDegrees": 69.13650627554455,
+      "latitudeDegrees": -0.6831296122425995
+    },
+    {
+      "name": "Callisto",
+      "errorKm": 0.00011538604808540947,
+      "longitudeDegrees": 69.07915388081324,
+      "latitudeDegrees": -0.6729307787264492
+    },
+    {
+      "name": "Mimas",
+      "errorKm": 0.000029808416339580714,
+      "longitudeDegrees": 59.03588050064536,
+      "latitudeDegrees": -2.023066119866511
+    },
+    {
+      "name": "Enceladus",
+      "errorKm": 0.00002947150214350451,
+      "longitudeDegrees": 59.04087937401101,
+      "latitudeDegrees": -2.0228893770322762
+    },
+    {
+      "name": "Tethys",
+      "errorKm": 0.00006414027720968852,
+      "longitudeDegrees": 59.04845466302112,
+      "latitudeDegrees": -2.0258617344044767
+    },
+    {
+      "name": "Dione",
+      "errorKm": 0.00008415812803332589,
+      "longitudeDegrees": 59.05297252232492,
+      "latitudeDegrees": -2.029601207035011
+    },
+    {
+      "name": "Rhea",
+      "errorKm": 0.00007448853091299789,
+      "longitudeDegrees": 59.05934096557252,
+      "latitudeDegrees": -2.029961613905538
+    },
+    {
+      "name": "Titan",
+      "errorKm": 0.00007801499492048214,
+      "longitudeDegrees": 59.07713278262315,
+      "latitudeDegrees": -2.045954137531566
+    },
+    {
+      "name": "Iapetus",
+      "errorKm": 0.00007209260633793597,
+      "longitudeDegrees": 59.08899639274773,
+      "latitudeDegrees": -2.0596437955872067
+    },
+    {
+      "name": "Ariel",
+      "errorKm": 0.17949213791754465,
+      "longitudeDegrees": 320.38669774573634,
+      "latitudeDegrees": -0.7093840767372448
+    },
+    {
+      "name": "Umbriel",
+      "errorKm": 0.17946543112197277,
+      "longitudeDegrees": 320.38324489922945,
+      "latitudeDegrees": -0.7114010465970293
+    },
+    {
+      "name": "Titania",
+      "errorKm": 0.17947274139168276,
+      "longitudeDegrees": 320.38430512800977,
+      "latitudeDegrees": -0.7161751446454251
+    },
+    {
+      "name": "Oberon",
+      "errorKm": 0.1794926773867235,
+      "longitudeDegrees": 320.38233352440557,
+      "latitudeDegrees": -0.7007735941612128
+    },
+    {
+      "name": "Miranda",
+      "errorKm": 0.17951099773189008,
+      "longitudeDegrees": 320.38668899492905,
+      "latitudeDegrees": -0.7075926108713848
+    },
+    {
+      "name": "Triton",
+      "errorKm": 0.17951581597815364,
+      "longitudeDegrees": 306.10949756849556,
+      "latitudeDegrees": 0.17727876585483224
+    },
+    {
+      "name": "Proteus",
+      "errorKm": 0.1795002946712221,
+      "longitudeDegrees": 306.10466638788665,
+      "latitudeDegrees": 0.1758220615085266
+    },
+    {
+      "name": "Nereid",
+      "errorKm": 0.17948947037297014,
+      "longitudeDegrees": 306.1822949732111,
+      "latitudeDegrees": 0.18398644021696853
+    },
+    {
+      "name": "Ceres",
+      "errorKm": 0.00020997453020120513,
+      "longitudeDegrees": 248.07544670910139,
+      "latitudeDegrees": 2.3003278752654706
+    },
+    {
+      "name": "Vesta",
+      "errorKm": 0.00024517525404873803,
+      "longitudeDegrees": 343.93926903200105,
+      "latitudeDegrees": -6.186021498525094
+    },
+    {
+      "name": "Pallas",
+      "errorKm": 0.0001809735076538618,
+      "longitudeDegrees": 215.2719894746606,
+      "latitudeDegrees": 25.007725119322078
+    },
+    {
+      "name": "Hygiea",
+      "errorKm": 0.00023307568303800293,
+      "longitudeDegrees": 292.5985157320491,
+      "latitudeDegrees": 0.5984365550907783
+    }
+  ]
+}
