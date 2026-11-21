@@ -1,3 +1,4 @@
+import {orbitGuide,GM} from './orbit-guides.js';
 import {loadEphemeris} from './ephemeris.js';
 import {calendarDisplayPosition} from './calendar.js';
 import {renderResolution} from './render-resolution.js';
@@ -81,8 +82,23 @@ const asteroidData=(await data('./named-asteroids.json')).map(a=>realisticScale?
 const asteroids=createAsteroids(scene,asteroidData,label,pickMeshes,selectAsteroid);
 const calendarBodies=new Map([...planets,...asteroidData,...moons.map(m=>({...m,orbit:m.orbitData.orbit}))].map(b=>[b.name,b]));
 const datedPosition=(name,at=days)=>calendarDisplayPosition(calendar,name,at,calendarBodies,realisticScale);
-const referenceTrail=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.45}));referenceTrail.visible=referenceMode;scene.add(referenceTrail);let trailKey='',trailAt=NaN;
-function updateReferenceTrail(){if(!referenceMode||!referenceTrail.visible)return;const obj=selectedAsteroid||selectedMoon||(selected>=0?planets[selected]:null);if(!obj){referenceTrail.geometry.setFromPoints([]);return}const name=obj.name,parent=selectedMoon?.parent;const currentParent=parent?new THREE.Vector3(...datedPosition(parent)):new THREE.Vector3();referenceTrail.position.copy(currentParent);if(trailKey===name&&Math.abs(days-trailAt)<.01)return;trailKey=name;trailAt=days;const half=Math.min(366,Number(obj.period)||366)/2,start=Math.max(MIN_DATE_DAYS,days-half),end=Math.min(MAX_DATE_DAYS,days+half),points=[];for(let i=0;i<=256;i++){const at=start+(end-start)*i/256,point=new THREE.Vector3(...datedPosition(name,at));if(parent)point.sub(new THREE.Vector3(...datedPosition(parent,at)));points.push(point)}referenceTrail.geometry.dispose();referenceTrail.geometry=new THREE.BufferGeometry().setFromPoints(points);}
+const referenceOrbitGroup=new THREE.Group();scene.add(referenceOrbitGroup);referenceOrbitGroup.visible=referenceMode;
+const referenceGuides=referenceMode?[...calendarBodies.values()].map(body=>{const line=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:body.parent?.25:.4}));referenceOrbitGroup.add(line);return {body,line}}):[];
+let guideDay=NaN;
+function updateReferenceTrail(){
+ if(!referenceMode||!referenceOrbitGroup.visible)return;
+ const rebuild=!Number.isFinite(guideDay)||Math.abs(days-guideDay)>=.01;
+ for(const {body,line} of referenceGuides){
+  const parent=body.parent||'Sun';line.position.fromArray(datedPosition(parent));
+  line.visible=!body.parent||(moonsVisible&&following&&selected>=0&&planets[selected].name===body.parent);
+  if(!rebuild)continue;
+  const state=calendar.state(body.name,days),center=calendar.state(parent,days),r=state.position.map((v,i)=>v-center.position[i]),v=state.velocity.map((v,i)=>v-center.velocity[i]);
+  const actual=Math.hypot(...r),display=new THREE.Vector3(...datedPosition(body.name)).distanceTo(line.position),factor=display/actual;
+  const points=orbitGuide(r,v,GM[parent]+(GM[body.name]||0)).map(([x,y,z])=>new THREE.Vector3(x*factor,z*factor,-y*factor));
+  line.geometry.dispose();line.geometry=new THREE.BufferGeometry().setFromPoints(points);
+ }
+ if(rebuild)guideDay=days;
+}
 $('labels').removeAttribute('aria-hidden');
 const beltObstacles=[{node:solar.group,radius:sunRadius*1.2},...bodies.map((b,i)=>({node:b.root,radius:planets[i].radius*(i===5?2.3:i===6?1.9:1.08)})),...moons.map(m=>({node:m.node,radius:m.radius*1.15})),...asteroids.items.map(a=>({node:a.root,radius:a.radius*1.2}))];
 const obstaclePosition=new THREE.Vector3();
@@ -147,7 +163,7 @@ $('inner').onclick=()=>overview(false,true);$('system-view').onclick=()=>{if(sel
 $('home').onclick=()=>overview();$('top').onclick=()=>overview(true);$('focus').onclick=()=>focus();
 $('play').onclick=()=>{if(referenceMode&&days>=MAX_DATE_DAYS)return;paused=!paused;$('play').textContent=paused?'▶':'Ⅱ';$('play').setAttribute('aria-label',paused?'Resume orbital movement':'Pause orbital movement')};function showTimeRate(){const rate=Number($('time').value);$('time-output').textContent=Math.abs(rate-1/86400)<1e-12?'1× · real time':`${rate.toLocaleString(undefined,{maximumFractionDigits:5})} days / sec`;}
 $('time').oninput=showTimeRate;$('slow-time').onclick=()=>{$('time').value='0.005';showTimeRate()};$('real-time').onclick=()=>{$('time').value=String(1/86400);showTimeRate()};dateSlider.oninput=()=>selectDate(Number(dateSlider.value)+(referenceMode?timeFraction():0));datePicker.oninput=()=>{if(datePicker.value)selectDate(dateInputToDay(datePicker.value)+(referenceMode?timeFraction():0))};$('date-prev-month').onclick=()=>shiftDateByMonth(-1);$('date-next-month').onclick=()=>shiftDateByMonth(1);
-$('paths').onclick=()=>{if(referenceMode){referenceTrail.visible=!referenceTrail.visible;$('paths').textContent=referenceTrail.visible?'Trajectory on':'Trajectory off';$('paths').setAttribute('aria-pressed',String(referenceTrail.visible));return;}orbitGroup.visible=!orbitGroup.visible;$('paths').textContent=`Orbits ${orbitGroup.visible?'on':'off'}`;$('paths').setAttribute('aria-pressed',orbitGroup.visible)};
+$('paths').onclick=()=>{const group=referenceMode?referenceOrbitGroup:orbitGroup;group.visible=!group.visible;$('paths').textContent=`Orbits ${group.visible?'on':'off'}`;$('paths').setAttribute('aria-pressed',String(group.visible))};
 $('names').onclick=()=>{names=!names;$('names').textContent=`Labels ${names?'on':'off'}`;$('names').setAttribute('aria-pressed',names)};
 $('moons').onclick=()=>{moonsVisible=!moonsVisible;if(!moonsVisible&&selectedMoon)selectPlanet(selected);$('moons').textContent=`Moons ${moonsVisible?'on':'off'}`;$('moons').setAttribute('aria-pressed',moonsVisible)};
 $('belts').onclick=()=>{environment.setBelts(!environment.beltsOn);$('belts').textContent=`Belts ${environment.beltsOn?'on':'off'}`;$('belts').setAttribute('aria-pressed',environment.beltsOn)};
@@ -163,18 +179,18 @@ if(referenceMode){
  const choices=[{name:'Sun',choose:()=>selectPlanet(-1)},...planets.map((p,i)=>({name:p.name,choose:()=>selectPlanet(i)})),...moons.map(m=>({name:m.name,choose:()=>selectMoon(m)})),...asteroids.items.map(a=>({name:a.name,choose:()=>selectAsteroid(a)}))];
  chooser.add(new Option('Explore all 35 bodies…',''));choices.forEach((c,i)=>chooser.add(new Option(c.name,String(i))));chooser.onchange=()=>{if(chooser.value!=='')choices[Number(chooser.value)].choose()};document.querySelector('.scene-actions').prepend(chooser);
  document.querySelector('.intro p').textContent=realisticScale?'35 bodies · JPL positions · True distance scale':'35 bodies · JPL positions · Illustrative distance scale';
- document.querySelector('.mini-note').textContent=realisticScale?'JPL-based interpolated motion · 2000 only. Trajectory shows available data; moon paths are relative to their planet. Surface orientation is illustrative.':'JPL-based interpolated motion · Compressed distances and enlarged bodies. Numeric distances use physical coordinates; interpolation is approximate.';
+ document.querySelector('.mini-note').textContent=realisticScale?'JPL-based interpolated motion · 2000 only. White paths are instantaneous orbit guides; moon paths are relative to their planet. Surface orientation is illustrative.':'JPL-based interpolated motion · Compressed distances and enlarged bodies. Numeric distances use physical coordinates; interpolation is approximate.';
  const nasaButton=document.createElement('button');nasaButton.textContent='NASA 3D reference';nasaButton.onclick=()=>{const stamp=utcDate().toISOString();window.open('https://eyes.nasa.gov/apps/solar-system/#/home?time='+encodeURIComponent(stamp)+'&rate=0','_blank','noopener')};document.querySelector('.scene-actions').append(nasaButton);
- const alignmentLink=document.createElement('a');alignmentLink.href='./ephemeris/2000/alignment.html';alignmentLink.target='_blank';alignmentLink.rel='noopener';alignmentLink.className='accuracy-link';alignmentLink.textContent='Alignment check';document.querySelector('.scene-actions').append(alignmentLink);
- const accuracyLink=document.createElement('a');accuracyLink.href='./ephemeris/2000/accuracy.html';accuracyLink.target='_blank';accuracyLink.rel='noopener';accuracyLink.textContent='Accuracy checks ↗';accuracyLink.className='accuracy-link';document.querySelector('.scene-actions').append(accuracyLink);
+ const alignmentLink=document.createElement('a');alignmentLink.href='./ephemeris/2000/alignment.html';alignmentLink.target='_blank';alignmentLink.rel='noopener';alignmentLink.className='accuracy-link';alignmentLink.textContent='Alignment check';modelInfo.append(alignmentLink);
+ const accuracyLink=document.createElement('a');accuracyLink.href='./ephemeris/2000/accuracy.html';accuracyLink.target='_blank';accuracyLink.rel='noopener';accuracyLink.textContent='Accuracy checks ↗';accuracyLink.className='accuracy-link';modelInfo.append(accuracyLink);
  document.body.classList.add('continuous-calendar');document.querySelector('.time-label span').textContent='JPL MOTION · 2000';showTimeRate();
  const utcInput=document.createElement('input');utcInput.type='time';utcInput.id='calendar-time';utcInput.step='1';utcInput.setAttribute('aria-label','Time in UTC');utcInput.title='UTC time within verified 2000 coverage';utcInput.value=utcDate().toISOString().slice(11,19);utcInput.oninput=()=>{if(utcInput.value)selectDate(dateInputToDay(datePicker.value)+timeFraction())};document.querySelector('.date-control').append(utcInput);
  $('date').setAttribute('aria-label','Select a day in the verified 2000 calendar');$('date').title='Continuous ephemeris coverage: 2000 only';
- orbitGroup.visible=false;$('paths').setAttribute('aria-pressed','true');$('paths').textContent='Trajectory on';
+ orbitGroup.visible=false;$('paths').setAttribute('aria-pressed','true');$('paths').textContent='Orbits on';
  environment.setBelts(false);environment.setDust(false);['belts','dust-gas'].forEach(id=>{$(id).disabled=true;$(id).setAttribute('aria-pressed','false')});$('belts').textContent='Belt particles hidden';$('dust-gas').textContent='Illustrative gas hidden';
  $('scale-mode').textContent=realisticScale?'True distance scale ✓':'True distance scale';
  const exit=document.createElement('button');exit.textContent='Exit calendar';exit.onclick=()=>{const u=new URL(location.href);u.search='?scale=realistic';location.assign(u.href)};document.querySelector('.scene-actions').append(exit);
- modelParagraphs[2].textContent='Calendar mode uses dense NASA/JPL Horizons position and velocity samples with cubic Hermite interpolation for all 35 selectable bodies, limited to 2000. Separate test queries measure interpolation error relative to JPL, not the absolute uncertainty of JPL itself. Source positions are heliocentric in the J2000 ecliptic frame. Illustrative Scale preserves dated directions and radial variation while compressing each orbit and enlarging bodies. True distance scale uses 100 units per AU for distances and nominal radii. Playback and UTC time selection interpolate within the sampled year; no extrapolation is permitted. The selected trajectory is clipped to available dates, and moon trails are parent-relative. Body orientation, lighting and surface effects remain illustrative.';
+ modelParagraphs[2].textContent='Calendar mode uses dense NASA/JPL Horizons position and velocity samples with cubic Hermite interpolation for all 35 selectable bodies, limited to 2000. Separate test queries measure interpolation error relative to JPL, not the absolute uncertainty of JPL itself. Source positions are heliocentric in the J2000 ecliptic frame. Illustrative Scale preserves dated directions and radial variation while compressing each orbit and enlarging bodies. True distance scale uses 100 units per AU for distances and nominal radii. Playback and UTC time selection interpolate within the sampled year; no extrapolation is permitted. White paths are complete instantaneous two-body orbit guides fitted to the dated positions and velocities, not forecasts of an exact future trajectory. Moon guides appear when following their planet. The dated objects still use JPL interpolation. Body orientation, lighting and surface effects remain illustrative.';
 }
 
 const phonePointer=matchMedia('(pointer:coarse)');
